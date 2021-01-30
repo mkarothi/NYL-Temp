@@ -1,0 +1,37 @@
+<flow-definition plugin="workflow-job@2.40">
+<actions>
+<org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.7.2"/>
+<org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.7.2">
+<jobProperties/>
+<triggers/>
+<parameters>
+<string>SALEFORCE_TARGET</string>
+</parameters>
+<options/>
+</org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+</actions>
+<description/>
+<keepDependencies>false</keepDependencies>
+<properties>
+<com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.13">
+<gitLabConnection/>
+</com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+<com.synopsys.arc.jenkinsci.plugins.jobrestrictions.jobs.JobRestrictionProperty plugin="job-restrictions@0.8"/>
+<hudson.model.ParametersDefinitionProperty>
+<parameterDefinitions>
+<hudson.model.StringParameterDefinition>
+<name>SALEFORCE_TARGET</name>
+<description>Enter the target name</description>
+<defaultValue/>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+</parameterDefinitions>
+</hudson.model.ParametersDefinitionProperty>
+</properties>
+<definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.87">
+<script>pipeline { agent any environment{ GITHUB_URL="git@git.nylcloud.com:CRM/ilife_salesforce.git" BRANCH_NAME="master" SALEFORCE_TARGET="Target name" } parameters{ string(name: 'SALEFORCE_TARGET', defaultValue: '', description: 'Enter the target name') } stages{ stage('Git SCM'){ steps{ git branch: "${BRANCH_NAME}", credentialsId: 'T65OKG8', url: "${GITHUB_URL}" } } stage('Ant Build'){ steps{ sh 'ls -lrt' // sh 'cd MASTER' // sh 'ant retreive ${TARGET_NAME}' } } } post{ success { emailext body: '''${JELLY_SCRIPT,template="html"}''', mimeType: 'text/html', recipientProviders: [developers()], subject: 'Test', to: 'vimal_vijayan@newyorklife.com' } failure{ emailext body: '''${JELLY_SCRIPT,template="html"}''', mimeType: 'text/html', recipientProviders: [developers()], subject: 'Test', to: 'vimal_vijayan@newyorklife.com' } } }</script>
+<sandbox>true</sandbox>
+</definition>
+<triggers/>
+<disabled>false</disabled>
+</flow-definition>
