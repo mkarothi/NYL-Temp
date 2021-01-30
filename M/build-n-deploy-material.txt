@@ -1,0 +1,3 @@
+https://stackoverflow.com/questions/55332833/is-there-any-way-to-convert-maven-project-to-pipeline-in-an-automated-way
+
+https://plugins.jenkins.io/pipeline-maven/
