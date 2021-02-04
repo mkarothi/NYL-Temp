@@ -1,0 +1,294 @@
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<project>
+<actions/>
+<description/>
+<displayName>IL_On_Commit_Validate_DX</displayName>
+<keepDependencies>false</keepDependencies>
+<properties>
+<hudson.security.AuthorizationMatrixProperty>
+<inheritanceStrategy class="org.jenkinsci.plugins.matrixauth.inheritance.InheritParentStrategy"/>
+<permission>com.cloudbees.plugins.credentials.CredentialsProvider.View:authenticated</permission>
+<permission>hudson.model.Item.Cancel:authenticated</permission>
+<permission>hudson.model.Item.Discover:authenticated</permission>
+<permission>hudson.model.Item.Read:authenticated</permission>
+<permission>hudson.model.Item.Workspace:authenticated</permission>
+</hudson.security.AuthorizationMatrixProperty>
+<com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.12">
+<gitLabConnection/>
+</com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+<hudson.model.ParametersDefinitionProperty>
+<parameterDefinitions>
+<hudson.plugins.random__string__parameter.RandomStringParameterDefinition plugin="random-string-parameter@1.0">
+<name>RANDOMSTRING</name>
+<description/>
+<failedValidationMessage>String is Invalid</failedValidationMessage>
+</hudson.plugins.random__string__parameter.RandomStringParameterDefinition>
+</parameterDefinitions>
+</hudson.model.ParametersDefinitionProperty>
+</properties>
+<scm class="hudson.scm.NullSCM"/>
+<quietPeriod>0</quietPeriod>
+<canRoam>true</canRoam>
+<disabled>false</disabled>
+<blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+<blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+<jdk>JDK18</jdk>
+<triggers>
+<org.jenkinsci.plugins.gwt.GenericTrigger plugin="generic-webhook-trigger@1.56">
+<spec/>
+<genericVariables>
+<org.jenkinsci.plugins.gwt.GenericVariable>
+<expressionType>JSONPath</expressionType>
+<key>commitid</key>
+<value>$.commits[0].id</value>
+<regexpFilter/>
+<defaultValue/>
+</org.jenkinsci.plugins.gwt.GenericVariable>
+<org.jenkinsci.plugins.gwt.GenericVariable>
+<expressionType>JSONPath</expressionType>
+<key>BRANCH</key>
+<value>.ref</value>
+<regexpFilter/>
+<defaultValue/>
+</org.jenkinsci.plugins.gwt.GenericVariable>
+<org.jenkinsci.plugins.gwt.GenericVariable>
+<expressionType>JSONPath</expressionType>
+<key>Author_Email</key>
+<value>$.commits[0].author.email</value>
+<regexpFilter/>
+<defaultValue/>
+</org.jenkinsci.plugins.gwt.GenericVariable>
+<org.jenkinsci.plugins.gwt.GenericVariable>
+<expressionType>JSONPath</expressionType>
+<key>Author_Name</key>
+<value>$.commits[0].author.name</value>
+<regexpFilter/>
+<defaultValue/>
+</org.jenkinsci.plugins.gwt.GenericVariable>
+<org.jenkinsci.plugins.gwt.GenericVariable>
+<expressionType>JSONPath</expressionType>
+<key>Author_User_Name</key>
+<value>$.commits[0].author.username</value>
+<regexpFilter/>
+<defaultValue/>
+</org.jenkinsci.plugins.gwt.GenericVariable>
+</genericVariables>
+<regexpFilterText>$BRANCH $Author_Name</regexpFilterText>
+<regexpFilterExpression>(?s)^((?!(tags|CIINCREMENTAL|CI_INCREMENTAL|crmcid)).)*$</regexpFilterExpression>
+<printPostContent>true</printPostContent>
+<printContributedVariables>true</printContributedVariables>
+<causeString>Generic Cause</causeString>
+<token>ilsfdx</token>
+<silentResponse>false</silentResponse>
+</org.jenkinsci.plugins.gwt.GenericTrigger>
+</triggers>
+<concurrentBuild>true</concurrentBuild>
+<customWorkspace>/opt/apps/jenkins2/sources/Institutional_Life/IL_On_Commit_Validate_DX/Parallel_Commit_Validations_$BUILD_NUMBER</customWorkspace>
+<builders>
+<EnvInjectBuilder plugin="envinject@2.1.6">
+<info>
+<propertiesContent>CISANDBOXREL1=CIREL01 CISANDBOXREL2=CIREL02 CISANDBOXREL3=CIREL03 CISANDBOXREL4=CIREL04 CISANDBOXREL5=CIREL05 CISANDBOXREL6=CIREL06 CISANDBOXREL7=CIREL07 CISANDBOXREL8=CIREL08 CISANDBOXREL9=CIREL09 CISANDBOXREL10=CIREL10 CISANDBOXMAINT1=CIMAINT001 CISANDBOXMAINT1=CIMAINT001 CISANDBOXMAINT2=CIMAINT002 CISANDBOXMAINT3=CIMAINT003 CISANDBOXMAINT4=CIMAINT004 CISANDBOXMAINT5=CIMAINT005 MASTER_DIRECTORY=MASTER_DIR RELEASE_DIRECTORY=RELEASE_DIR INCREMENTAL_DIRECTORY=INCREMENTAL_DIR API_CALL=SBINCREMENTALBUILD INCLUDE_PROFILES=T INCLUDE_FLOWS=T</propertiesContent>
+</info>
+</EnvInjectBuilder>
+<hudson.tasks.Shell>
+<command>#!/bin/bash # Define a timestamp function timestamp() { date +"%T" } echo "********************************************************************" echo " " BRANCH2=$BRANCH echo 'pre branch2 = '$BRANCH2 BRANCH2=${BRANCH2#*heads/} # Remove everything up to a heads/ echo 'post pre branch2 = '$BRANCH2 BRANCH2=${BRANCH2%\"*} # Remove suffix echo 'post branch2 = '$BRANCH2 echo " " echo "********************************************************************" echo " " echo 'pwd: 'pwd echo 'workspace is: ' $WORKSPACE echo " " echo "********************************************************************" echo " " echo "$(timestamp): Cloning Started" MASTER_DIRECTORY=MASTER_DIR RELEASE_DIRECTORY=RELEASE_DIR INCREMENTAL_DIRECTORY=INCREMENTAL_DIR SOURCE_DIRECTORY=/opt/apps/jenkins2/sources/Salesforce_On_Commit_Validate_SOURCE EMPTYBRANCH=EMPTY_DX echo "Start Clone RELEASE and INCREMENTAL" git clone --reference $WORKSPACE/../mirror_repo git@git.nylcloud.com:CRM/ilife_salesforce.git $WORKSPACE/$RELEASE_DIRECTORY --branch $BRANCH2 & git clone --reference $WORKSPACE/../mirror_repo git@git.nylcloud.com:CRM/ilife_salesforce.git $WORKSPACE/$INCREMENTAL_DIRECTORY --branch $EMPTYBRANCH & wait wait wait echo "Cloning of RELEASE and INCREMENTAL is complete" echo "$(timestamp): Cloning of RELEASE and INCREMENTAL is complete" echo " " echo "********************************************************************" echo " " </command>
+</hudson.tasks.Shell>
+<EnvInjectBuilder plugin="envinject@2.1.6">
+<info>
+<propertiesFilePath>$WORKSPACE/$RELEASE_DIRECTORY/CI_VARIABLES</propertiesFilePath>
+</info>
+</EnvInjectBuilder>
+<EnvInjectBuilder plugin="envinject@2.1.6">
+<info>
+<propertiesFilePath>$WORKSPACE/$RELEASE_DIRECTORY/CI_Sandbox_Version.txt</propertiesFilePath>
+</info>
+</EnvInjectBuilder>
+<hudson.tasks.Shell>
+<command>#!/bin/bash # Define a timestamp function timestamp() { date +"%T" } echo " " echo "********************************************************************" echo " " echo "$(timestamp): Starting clone of CI_MASTER_BRANCH" if [ -z "$CI_MASTER_BRANCH" ] then echo "CI_MASTER_BRANCH is null - exiting" exit 1 else echo "CI_MASTER_BRANCH = $CI_MASTER_BRANCH - starting clone operation" fi echo "Start Clone CI_MASTER_BRANCH" git clone --reference $WORKSPACE/../mirror_repo git@git.nylcloud.com:CRM/ilife_salesforce.git $WORKSPACE/$MASTER_DIRECTORY --branch $CI_MASTER_BRANCH & wait echo "Clone complete" echo "$(timestamp): Cloning complete" echo " " echo "********************************************************************" echo " " echo "********************************************************************" echo " " echo "$(timestamp): Starting CI Sandbox selection" echo " " echo 'CI_Sandbox_Version is: '$CI_Sandbox_Version echo "RELEASE_NAME = $RELEASE_NAME" case $RELEASE_NAME in R18) echo 'CISANDBOXREL1 is: '$CISANDBOXREL1 echo 'CISANDBOXREL2 is: '$CISANDBOXREL2 echo 'CISANDBOXREL3 is: '$CISANDBOXREL3 echo 'CISANDBOXREL4 is: '$CISANDBOXREL4 echo 'CISANDBOXREL5 is: '$CISANDBOXREL5 echo 'CISANDBOXREL6 is: '$CISANDBOXREL6 echo 'CISANDBOXREL2 is: '$CISANDBOXREL7 echo 'CISANDBOXREL3 is: '$CISANDBOXREL8 echo 'CISANDBOXREL4 is: '$CISANDBOXREL9 echo 'CISANDBOXREL5 is: '$CISANDBOXREL10 #CISANDBOXES=("$CISANDBOXREL1" "$CISANDBOXREL2" "$CISANDBOXREL3") #CISANDBOXES=("$CISANDBOXREL1" "$CISANDBOXREL2" "$CISANDBOXREL3" "$CISANDBOXREL4" "$CISANDBOXREL5" "$CISANDBOXREL6") CISANDBOXES=("$CISANDBOXREL1" "$CISANDBOXREL2" "$CISANDBOXREL3" "$CISANDBOXREL4" "$CISANDBOXREL5" "$CISANDBOXREL6" "$CISANDBOXREL7" "$CISANDBOXREL8" "$CISANDBOXREL9" "$CISANDBOXREL10") #CISANDBOXES=("$CISANDBOXREL1") #CISANDBOXES=("$CISANDBOXREL6" "$CISANDBOXREL7" "$CISANDBOXREL8" "$CISANDBOXREL9" "$CISANDBOXREL10") # "$CISANDBOXREL6" "$CISANDBOXREL7" "$CISANDBOXREL8" "$CISANDBOXREL9" "$CISANDBOXREL10" CISANDBOX=${CISANDBOXES[$RANDOM%10]} echo "CISANDBOX = $CISANDBOX" ;; R17_MAINT) echo 'CISANDBOXMAINT1 is: '$CISANDBOXMAINT1 echo 'CISANDBOXMAINT2 is: '$CISANDBOXMAINT2 echo 'CISANDBOXMAINT3 is: '$CISANDBOXMAINT3 echo 'CISANDBOXMAINT4 is: '$CISANDBOXMAINT4 echo 'CISANDBOXMAINT5 is: '$CISANDBOXMAINT5 CISANDBOXES=("$CISANDBOXMAINT1" "$CISANDBOXMAINT2" "$CISANDBOXMAINT3" "$CISANDBOXMAINT4" "$CISANDBOXMAINT5") #CISANDBOXES=("$CISANDBOXMAINT1" "$CISANDBOXMAINT2" "$CISANDBOXMAINT3" "$CISANDBOXMAINT4" "$CISANDBOXMAINT5") #CISANDBOXES=("$CISANDBOXREL1") CISANDBOX=${CISANDBOXES[$RANDOM%5]} #CISANDBOX=$CISANDBOXMAINT1 echo "CISTANDBOX = $CISANDBOX" ;; *) echo "RELEASE_NAME is empty - abending" exit 1 ;; esac echo 'CI_SANDBOX_NAME='$CISANDBOX echo 'CI_SANDBOX_NAME='$CISANDBOX > $WORKSPACE/$RELEASE_DIRECTORY/CI_SANDBOX_NAME.txt echo " " echo "$(timestamp): CI Sandbox selection completed" echo " " echo "********************************************************************" echo " " echo "$(timestamp): Dumping JSON variable values" echo " " echo 'Ref = ' $ref echo 'BRANCH = ' $BRANCH echo 'commitid = ' $commitid echo 'Author Email = '$Author_Email echo " " echo "$(timestamp): Dumping JSON variable values completed" echo " " echo "********************************************************************" echo " "</command>
+</hudson.tasks.Shell>
+<EnvInjectBuilder plugin="envinject@2.1.6">
+<info>
+<propertiesFilePath>$WORKSPACE/$RELEASE_DIRECTORY/CI_SANDBOX_NAME.txt</propertiesFilePath>
+</info>
+</EnvInjectBuilder>
+<hudson.tasks.Shell>
+<command>echo 'sandbox to validate in is: '$CI_SANDBOX_NAME</command>
+</hudson.tasks.Shell>
+<hudson.tasks.Shell>
+<command>#!/bin/bash cd $WORKSPACE/$RELEASE_DIRECTORY TAG_PREFIX=TCI RELEASE_NUMBER=$RELEASE_NAME TAG_FOR_BUILD=$TAG_PREFIX'_'$RELEASE_NUMBER'_'$BUILD_NUMBER echo 'TAG_PREFIX is: '$TAG_PREFIX echo 'RELEASE_NUMBER is: '$RELEASE_NUMBER echo 'TAG_FOR_BUILD is: '$TAG_FOR_BUILD BRANCH2=$BRANCH echo 'pre branch2 = '$BRANCH2 BRANCH2=${BRANCH2#*heads/} # Remove everything up to a heads/ echo 'post pre branch2 = '$BRANCH2 BRANCH2=${BRANCH2%\"*} # Remove suffix echo 'post branch2 = '$BRANCH2 echo 'get last commit id' var=$(echo 'git rev-parse ' $BRANCH2 2>&1) echo 'git command is to run is: ' $var lastcommitid=$($var 2>&1) echo 'Last commit id is: ' $lastcommitid echo 'lastcommitid='$lastcommitid >> BUILD_VARIABLES.txt echo 'TAG_PREFIX='$TAG_PREFIX >> BUILD_VARIABLES.txt echo 'RELEASE_NUMBER='$RELEASE_NUMBER >> BUILD_VARIABLES.txt echo 'TAG_FOR_BUILD='$TAG_FOR_BUILD >> BUILD_VARIABLES.txt echo 'RELEASE_BRANCH='$BRANCH2 >> BUILD_VARIABLES.txt echo 'INCREMENTAL_BRANCH=CI_INCREMENTAL_'$RELEASE_NAME >> BUILD_VARIABLES.txt git tag $TAG_FOR_BUILD git push origin $TAG_FOR_BUILD git checkout $TAG_FOR_BUILD</command>
+</hudson.tasks.Shell>
+<EnvInjectBuilder plugin="envinject@2.1.6">
+<info>
+<propertiesFilePath>$WORKSPACE/$RELEASE_DIRECTORY/BUILD_VARIABLES.txt</propertiesFilePath>
+</info>
+</EnvInjectBuilder>
+<hudson.tasks.Shell>
+<command>#!/bin/bash echo 'TAG_FOR_BUILD after Env Injection is: ' $TAG_FOR_BUILD echo 'Full or Incremental = ' $FULL_OR_INCREMENTAL echo '********************************' echo 'Master Directory = ' $MASTER_DIRECTORY echo 'Master Branch = ' $CI_MASTER_BRANCH echo '********************************' echo 'Release Directory = ' $RELEASE_DIRECTORY echo 'Release Branch = ' $RELEASE_BRANCH echo '********************************' echo 'Incremental Directory = ' $INCREMENTAL_DIRECTORY echo 'Incremental Branch = ' $INCREMENTAL_BRANCH echo '********************************'</command>
+</hudson.tasks.Shell>
+<org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder plugin="conditional-buildstep@1.3.6">
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+<runCondition class="org.jenkins_ci.plugins.run_condition.core.StringsMatchCondition" plugin="run-condition@1.2">
+<arg1>$FULL_OR_INCREMENTAL</arg1>
+<arg2>FULL</arg2>
+<ignoreCase>true</ignoreCase>
+</runCondition>
+<conditionalbuilders>
+<hudson.tasks.Shell>
+<command>#!/bin/bash set +e echo 'workspace is: ' $WORKSPACE cd $WORKSPACE if [ -d "$WORKSPACE/$MASTER_DIRECTORY" ]; then # $MASTER_DIRECTORY Exists! echo $WORKSPACE/$MASTER_DIRECTORY Exists! cd $WORKSPACE/$MASTER_DIRECTORY git config --unset-all remote.origin.fetch git config --add remote.origin.fetch +refs/heads/master:refs/remotes/origin/$CI_MASTER_BRANCH git fetch origin $CI_MASTER_BRANCH git checkout $CI_MASTER_BRANCH git pull else # $MASTER_DIRECTORY Does NOT Exist! Cloning new. echo $WORKSPACE/$MASTER_DIRECTORY Does NOT Exist! Cloning new. cd $WORKSPACE git clone --reference $WORKSPACE/../mirror_repo git@git.nylcloud.com:CRM/ilife_salesforce.git $MASTER_DIRECTORY cd $WORKSPACE/$MASTER_DIRECTORY git checkout $CI_MASTER_BRANCH fi if [ -d "$WORKSPACE/$RELEASE_DIRECTORY" ]; then # $RELEASE_DIRECTORY Exists! echo $WORKSPACE/$RELEASE_DIRECTORY Exists! cd $WORKSPACE/$RELEASE_DIRECTORY git config --unset-all remote.origin.fetch git config --add remote.origin.fetch +refs/heads/master:refs/remotes/origin/$RELEASE_BRANCH git fetch origin $RELEASE_BRANCH git checkout $RELEASE_BRANCH git pull else # $RELEASE_DIRECTORY Does NOT Exist! Cloning new. echo $WORKSPACE/$RELEASE_DIRECTORY Does NOT Exist! Cloning new. cd $WORKSPACE git clone --reference $WORKSPACE/../mirror_repo git@git.nylcloud.com:CRM/ilife_salesforce.git $RELEASE_DIRECTORY cd $WORKSPACE/$RELEASE_DIRECTORY git checkout $RELEASE_BRANCH fi if [ -d "$WORKSPACE/$INCREMENTAL_DIRECTORY" ]; then # $INCREMENTAL_DIRECTORY Exists! echo $WORKSPACE/$INCREMENTAL_DIRECTORY Exists! cd $WORKSPACE/$INCREMENTAL_DIRECTORY echo "control before checkpoint 0" git show-ref --verify --quiet refs/remotes/origin/$INCREMENTAL_BRANCH BRANCH_EXIST_REMOTE=$? echo "value of BRANCH_EXIST_REMOTE is:" $BRANCH_EXIST_REMOTE echo "control before checkpoint 2" git show-ref --verify --quiet refs/heads/$INCREMENTAL_BRANCH BRANCH_EXIST_LOCAL=$? echo "value of BRANCH_EXIST_LOCAL is:" $BRANCH_EXIST_LOCAL if (( BRANCH_EXIST_REMOTE == 1 && BRANCH_EXIST_LOCAL == 0 )); then git branch --delete $INCREMENTAL_BRANCH #Overriding the value so that new branch will be created BRANCH_EXIST_LOCAL=1 fi if (( BRANCH_EXIST_REMOTE == 0 || BRANCH_EXIST_LOCAL == 0 )) then #echo "Branch name $INCREMENTAL_BRANCH already exists 0." git config --unset-all remote.origin.fetch git config --add remote.origin.fetch +refs/heads/master:refs/remotes/origin/$INCREMENTAL_BRANCH git fetch origin $INCREMENTAL_BRANCH git checkout $INCREMENTAL_BRANCH git branch --set-upstream $INCREMENTAL_BRANCH origin/$INCREMENTAL_BRANCH git pull else echo "Branch name $INCREMENTAL_BRANCH did not exist 1. Creating now." git checkout EMPTY git checkout -b $INCREMENTAL_BRANCH git push origin $INCREMENTAL_BRANCH git branch --set-upstream $INCREMENTAL_BRANCH origin/$INCREMENTAL_BRANCH fi else # $INCREMENTAL_DIRECTORY Does NOT Exist! Cloning new. echo $WORKSPACE/$INCREMENTAL_DIRECTORY Does NOT Exist! Cloning new. cd $WORKSPACE git clone --reference $WORKSPACE/../mirror_repo git@git.nylcloud.com:CRM/ilife_salesforce.git $INCREMENTAL_DIRECTORY cd $WORKSPACE/$INCREMENTAL_DIRECTORY git show-ref --verify --quiet refs/remotes/origin/$INCREMENTAL_BRANCH BRANCH_EXIST_REMOTE=$? git show-ref --verify --quiet refs/heads/$INCREMENTAL_BRANCH BRANCH_EXIST_LOCAL=$? if (( BRANCH_EXIST_REMOTE == 1 && BRANCH_EXIST_LOCAL == 0 )); then git branch --delete $INCREMENTAL_BRANCH #Overriding the value so that new branch will be created BRANCH_EXIST_LOCAL=1 fi if (( BRANCH_EXIST_REMOTE == 0 || BRANCH_EXIST_LOCAL == 0 )) then #echo "Branch name $INCREMENTAL_BRANCH already exists 0" git fetch origin $INCREMENTAL_BRANCH git checkout $INCREMENTAL_BRANCH git branch --set-upstream $INCREMENTAL_BRANCH origin/$INCREMENTAL_BRANCH else echo "Branch name $INCREMENTAL_BRANCH did not exist 1. Creating now." git checkout EMPTY git checkout -b $INCREMENTAL_BRANCH git push origin $INCREMENTAL_BRANCH git branch --set-upstream $INCREMENTAL_BRANCH origin/$INCREMENTAL_BRANCH fi fi pwd echo 'inc dir is: '$WORKSPACE/$INCREMENTAL_DIRECTORY/src/ rm -rf $WORKSPACE/$INCREMENTAL_DIRECTORY/force-app/main/default/* cp $WORKSPACE/$RELEASE_DIRECTORY/CI_Sandbox_Version.txt $WORKSPACE/$INCREMENTAL_DIRECTORY/CI_Sandbox_Version.txt cd $WORKSPACE/$INCREMENTAL_DIRECTORY/ echo 'RELEASE_NAME='$RELEASE_NAME > CI_VARIABLES echo 'FULL_OR_INCREMENTAL=INCREMENTAL' >> CI_VARIABLES echo 'API_CALL: ' $API_CALL echo 'SANDBOX_NAME: '$CI_SANDBOX_NAME echo 'MASTER_DIRECTORY: '$MASTER_DIRECTORY echo 'CI_MASTER_BRANCH: '$CI_MASTER_BRANCH echo 'RELEASE_DIRECTORY: '$RELEASE_DIRECTORY echo 'RELEASE_BRANCH: '$RELEASE_BRANCH echo 'INCREMENTAL_DIRECTORY: '$INCREMENTAL_DIRECTORY ls -ltr $WORKSPACE java -Dhttp.proxyPort=80 -Dhttps.proxyHost=proxy -Dworkspace=$WORKSPACE -jar /opt/apps/jenkins/crm_tools/Sandbox/CISandboxManager-2.0.jar $API_CALL $WORKSPACE/$MASTER_DIRECTORY $CI_MASTER_BRANCH $WORKSPACE/$RELEASE_DIRECTORY $RELEASE_BRANCH $WORKSPACE/$INCREMENTAL_DIRECTORY $INCLUDE_PROFILES $INCLUDE_FLOWS ls -ltr $WORKSPACE cd $WORKSPACE/$INCREMENTAL_DIRECTORY git status git add --all git commit -m 'CI commit for: '$commitid git push origin $INCREMENTAL_BRANCH TAG_FOR_BUILD_INC=$TAG_FOR_BUILD'_INC' git tag $TAG_FOR_BUILD_INC git push origin $TAG_FOR_BUILD_INC</command>
+</hudson.tasks.Shell>
+<hudson.tasks.Shell>
+<command>java -Dhttp.proxyPort=80 -Dhttps.proxyHost=zproxy.newyorklife.com -Dworkspace=$WORKSPACE -jar /opt/apps/jenkins/crm_tools/Sandbox/CISandboxManager-2.0.jar SFDXCLIENTID $CI_SANDBOX_NAME</command>
+</hudson.tasks.Shell>
+<EnvInjectBuilder plugin="envinject@2.1.6">
+<info>
+<propertiesFilePath>$WORKSPACE/sandbox_SFDXCLIENTID.txt</propertiesFilePath>
+</info>
+</EnvInjectBuilder>
+<hudson.tasks.Shell>
+<command>#!/bin/bash export ALL_PROXY=http://zproxy.newyorklife.com:80 export HTTP_PROXY=$ALL_PROXY export HTTPS_PROXY=$ALL_PROXY export http_proxy=$ALL_PROXY export https_proxy=$ALL_PROXY export NODE_EXTRA_CA_CERTS=/home/jenkins/ZscalerRootCertificate-2048-SHA256.crt export SANDBOX=$CI_SANDBOX_NAME cd $WORKSPACE/$INCREMENTAL_DIRECTORY sfdx force:auth:jwt:grant --clientid $sfdxclientid --jwtkeyfile /home/jenkins/jwt/server.key --username jenkins@newyorklife.com.prod.$CI_SANDBOX_NAME --instanceurl https://test.salesforce.com --setalias $CI_SANDBOX_NAME --loglevel debug #sfdx force:org:list #With Tests #RunSpecifiedTests #sfdx force:source:deploy -u $SANDBOX --sourcepath force-app --testlevel RunLocalTests #Without Tests #sfdx force:source:deploy -u $SANDBOX --sourcepath force-app -l RunLocalTests #Only Tests #sfdx force:apex:test:run -u $SANDBOX #sfdx force:source:deploy -u $CI_SANDBOX_NAME --sourcepath force-app -l RunLocalTests -c # Start Code Scan Integration BRANCH2=$BRANCH echo 'pre branch2 = '$BRANCH2 BRANCH2=${BRANCH2#*heads/} # Remove everything up to a heads/ BRANCH2=${BRANCH2%\"*} # Remove suffix echo 'post pre branch2 = '$BRANCH2 #Invoke Code Scan #sfdx codescan:run -k $BRANCH2 -t cbd4d65c9ab05a3c8dd161c12490dba17c90e73c -o default-organization -s http://ap21t01vsx.newyorklife.com:9000/ -Dcodescan.license_proxy=http://zproxy.net.nyl.com:9480 #Update Code Scan Result #curl --noproxy "*" "https://git.nylcloud.com/api/v3/repos/CRM/salesforce/statuses/$commitid?access_token=9cc81200b04df5158508dd3e95e7405537618fae" \ # -H "Content-Type: application/json" \ # -X POST \ # -d "{\"state\": \"success\",\"context\": \"continuous-integration/CodeScan\", \"description\": \"Code Scan Results\", \"target_url\": \"http://ap21t01vsx.newyorklife.com:9000/dashboard?id=$BRANCH2\"}" # End Code Scan Integration #Validate Only #sfdx force:config:set apiVersion=47.0 --global sfdx force:source:deploy -u $CI_SANDBOX_NAME --sourcepath force-app/main/default -c -w 180 </command>
+</hudson.tasks.Shell>
+</conditionalbuilders>
+</org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder>
+<org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder plugin="conditional-buildstep@1.3.6">
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+<runCondition class="org.jenkins_ci.plugins.run_condition.core.StringsMatchCondition" plugin="run-condition@1.2">
+<arg1>$FULL_OR_INCREMENTAL</arg1>
+<arg2>INCREMENTAL</arg2>
+<ignoreCase>false</ignoreCase>
+</runCondition>
+<conditionalbuilders/>
+</org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder>
+<org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder plugin="conditional-buildstep@1.3.6">
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+<runCondition class="org.jenkins_ci.plugins.text_finder_run_condition.TextFinderCondition" plugin="text-finder-run-condition@0.1">
+<regexp>Successfully validated the deployment</regexp>
+<checkConsoleOutput>true</checkConsoleOutput>
+</runCondition>
+<conditionalbuilders>
+<org.jenkins__ci.plugins.fail__the__build.FixResultBuilder plugin="fail-the-build-plugin@1.0">
+<defaultResultName>SUCCESS</defaultResultName>
+<success/>
+<unstable/>
+<failure/>
+<aborted/>
+</org.jenkins__ci.plugins.fail__the__build.FixResultBuilder>
+</conditionalbuilders>
+</org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder>
+<org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder plugin="conditional-buildstep@1.3.6">
+<condition class="org.jenkins_ci.plugins.text_finder_run_condition.TextFinderCondition" plugin="text-finder-run-condition@0.1">
+<regexp>Component Failures</regexp>
+<checkConsoleOutput>true</checkConsoleOutput>
+</condition>
+<buildStep class="org.jenkins_ci.plugins.fail_the_build.FixResultBuilder" plugin="fail-the-build-plugin@1.0">
+<defaultResultName>FAILURE</defaultResultName>
+<success/>
+<unstable/>
+<failure/>
+<aborted/>
+</buildStep>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+</org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder>
+</builders>
+<publishers>
+<hudson.plugins.postbuildtask.PostbuildTask plugin="postbuild-task@1.8">
+<tasks>
+<hudson.plugins.postbuildtask.TaskProperties>
+<logTexts>
+<hudson.plugins.postbuildtask.LogProperties>
+<logText>Successfully validated the deployment</logText>
+<operator>AND</operator>
+</hudson.plugins.postbuildtask.LogProperties>
+</logTexts>
+<EscalateStatus>true</EscalateStatus>
+<RunIfJobSuccessful>false</RunIfJobSuccessful>
+<script>curl --noproxy "*" "https://git.nylcloud.com/api/v3/repos/CRM/salesforce/statuses/$commitid?access_token=9cc81200b04df5158508dd3e95e7405537618fae" \ -H "Content-Type: application/json" \ -X POST \ -d "{\"state\": \"success\",\"context\": \"continuous-integration/jenkins\", \"description\": \"Jenkins\", \"target_url\": \"http://ap21t01vsx:8080/jenkins/job/Salesforce_On_Commit_Validate_DX/$BUILD_NUMBER/console\"}"</script>
+</hudson.plugins.postbuildtask.TaskProperties>
+<hudson.plugins.postbuildtask.TaskProperties>
+<logTexts>
+<hudson.plugins.postbuildtask.LogProperties>
+<logText>Component Failures</logText>
+<operator>AND</operator>
+</hudson.plugins.postbuildtask.LogProperties>
+</logTexts>
+<EscalateStatus>true</EscalateStatus>
+<RunIfJobSuccessful>false</RunIfJobSuccessful>
+<script>curl --noproxy "*" "https://git.nylcloud.com/api/v3/repos/CRM/salesforce/statuses/$commitid?access_token=9cc81200b04df5158508dd3e95e7405537618fae" \ -H "Content-Type: application/json" \ -X POST \ -d "{\"state\": \"failure\",\"context\": \"continuous-integration/jenkins\", \"description\": \"Jenkins\", \"target_url\": \"http://ap21t01vsx:8080/jenkins/job/Salesforce_On_Commit_Validate_DX/$BUILD_NUMBER/console\"}"</script>
+</hudson.plugins.postbuildtask.TaskProperties>
+</tasks>
+</hudson.plugins.postbuildtask.PostbuildTask>
+<hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@2.66">
+<recipientList>$DEFAULT_RECIPIENTS</recipientList>
+<configuredTriggers>
+<hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+<email>
+<recipientList>$Author_Email,RamaNaveen_Kommuri@newyorklife.com,prakashreddy_reddyvari@newyorklife.com,Mahendar_R_Mandadi@newyorklife.com,Avijit_Chakraborty@newyorklife.com,erick_lindeman@newyorklife.com</recipientList>
+<subject>Commit Validation has Failed for branch: $branch. Please follow below link or see attached log for errors.</subject>
+<body>Hi All, <br> <br> Commit validation has failed for branch: $branch. CommitID is: <br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${commitid} <br> <br> Tag created for this build is: <br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$TAG_FOR_BUILD <br> <br> Please access deployment log at: <br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://ap21t01vsx:8080/jenkins/job/Salesforce_On_Commit_Validate_DX/$build_number/consoleFull <br> <br> Please access commit in gitlab at: <br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;https://git.nylcloud.com/CRM/salesforce/commit/${commitid} <br> <br> Thanks <br> Erick</body>
+<recipientProviders>
+<hudson.plugins.emailext.plugins.recipients.DevelopersRecipientProvider/>
+</recipientProviders>
+<attachmentsPattern/>
+<attachBuildLog>true</attachBuildLog>
+<compressBuildLog>true</compressBuildLog>
+<replyTo>jenkins_user@newyorklife.com</replyTo>
+<contentType>text/html</contentType>
+</email>
+</hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+<hudson.plugins.emailext.plugins.trigger.SuccessTrigger>
+<email>
+<recipientList>$Author_Email</recipientList>
+<subject>Commit Validation is successful for branch: $branch.</subject>
+<body>Hi All, <br> <br> Commit validation is successful for branch: $branch. CommitID is: <br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${commitid} <br> <br> Tag created for this build is: <br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$TAG_FOR_BUILD <br> <br> Please access deployment log at: <br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://ap21t01vsx:8080/jenkins/job/Salesforce_On_Commit_Validate_DX/$build_number/consoleFull <br> <br> Please access commit in gitlab at: <br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;https://git.nylcloud.com/CRM/salesforce/commit/${commitid} <br> <br> Thanks <br> Erick</body>
+<recipientProviders>
+<hudson.plugins.emailext.plugins.recipients.DevelopersRecipientProvider/>
+</recipientProviders>
+<attachmentsPattern/>
+<attachBuildLog>false</attachBuildLog>
+<compressBuildLog>false</compressBuildLog>
+<replyTo>jenkins_user@newyorklife.com</replyTo>
+<contentType>text/html</contentType>
+</email>
+</hudson.plugins.emailext.plugins.trigger.SuccessTrigger>
+</configuredTriggers>
+<contentType>default</contentType>
+<defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
+<defaultContent>$DEFAULT_CONTENT</defaultContent>
+<attachmentsPattern/>
+<presendScript>$DEFAULT_PRESEND_SCRIPT</presendScript>
+<postsendScript>$DEFAULT_POSTSEND_SCRIPT</postsendScript>
+<attachBuildLog>false</attachBuildLog>
+<compressBuildLog>false</compressBuildLog>
+<replyTo>$DEFAULT_REPLYTO</replyTo>
+<from/>
+<saveOutput>false</saveOutput>
+<disabled>false</disabled>
+</hudson.plugins.emailext.ExtendedEmailPublisher>
+<hudson.plugins.ws__cleanup.WsCleanup plugin="ws-cleanup@0.37">
+<patterns class="empty-list"/>
+<deleteDirs>false</deleteDirs>
+<skipWhenFailed>false</skipWhenFailed>
+<cleanWhenSuccess>true</cleanWhenSuccess>
+<cleanWhenUnstable>true</cleanWhenUnstable>
+<cleanWhenFailure>true</cleanWhenFailure>
+<cleanWhenNotBuilt>true</cleanWhenNotBuilt>
+<cleanWhenAborted>true</cleanWhenAborted>
+<notFailBuild>false</notFailBuild>
+<cleanupMatrixParent>false</cleanupMatrixParent>
+<externalDelete/>
+<disableDeferredWipeout>false</disableDeferredWipeout>
+</hudson.plugins.ws__cleanup.WsCleanup>
+</publishers>
+<buildWrappers>
+<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper/>
+<hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.9"/>
+<EnvInjectBuildWrapper plugin="envinject@2.1.6">
+<info>
+<secureGroovyScript plugin="script-security@1.62">
+<script/>
+<sandbox>false</sandbox>
+</secureGroovyScript>
+<loadFilesFromMaster>false</loadFilesFromMaster>
+</info>
+</EnvInjectBuildWrapper>
+</buildWrappers>
+</project>

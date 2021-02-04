@@ -1,0 +1,197 @@
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<project>
+<actions/>
+<description/>
+<keepDependencies>false</keepDependencies>
+<properties>
+<hudson.security.AuthorizationMatrixProperty>
+<inheritanceStrategy class="org.jenkinsci.plugins.matrixauth.inheritance.InheritParentStrategy"/>
+<permission>com.cloudbees.plugins.credentials.CredentialsProvider.Update:t15kxnc</permission>
+<permission>com.cloudbees.plugins.credentials.CredentialsProvider.View:T15K9HT</permission>
+<permission>com.cloudbees.plugins.credentials.CredentialsProvider.View:t15km5l</permission>
+<permission>hudson.model.Item.Build:T15K9HT</permission>
+<permission>hudson.model.Item.Cancel:T15K9HT</permission>
+<permission>hudson.model.Item.Cancel:t15kxnc</permission>
+<permission>hudson.model.Item.Discover:T15K9HT</permission>
+<permission>hudson.model.Item.Discover:t15km5l</permission>
+<permission>hudson.model.Item.Discover:T15KPO3</permission>
+<permission>hudson.model.Item.Discover:t15kppf</permission>
+<permission>hudson.model.Item.Discover:T15KQLX</permission>
+<permission>hudson.model.Item.Discover:t15kxnc</permission>
+<permission>hudson.model.Item.Move:T15K9HT</permission>
+<permission>hudson.model.Item.Move:t15kxnc</permission>
+<permission>hudson.model.Item.Read:T15K9HT</permission>
+<permission>hudson.model.Item.Read:t15km5l</permission>
+<permission>hudson.model.Item.Read:T15KPO3</permission>
+<permission>hudson.model.Item.Read:t15kppf</permission>
+<permission>hudson.model.Item.Read:T15KQLX</permission>
+<permission>hudson.model.Item.Read:t15kxnc</permission>
+<permission>hudson.model.Item.Workspace:T15K9HT</permission>
+<permission>hudson.model.Item.Workspace:T15KPO3</permission>
+<permission>hudson.model.Item.Workspace:t15kppf</permission>
+<permission>hudson.model.Item.Workspace:T15KQLX</permission>
+<permission>hudson.model.Item.Workspace:t15kxnc</permission>
+</hudson.security.AuthorizationMatrixProperty>
+<com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.12">
+<gitLabConnection/>
+</com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+<hudson.model.ParametersDefinitionProperty>
+<parameterDefinitions>
+<hudson.model.StringParameterDefinition>
+<name>BRANCH</name>
+<description>R1 R1_SPRINT6 R1_SPRINT5 R1_SPRINT4 R1_SPRINT3 DEV_SPRINT4_EWL R1_SPRINT5_HOTFIX DEV_HMAGANTI_5_HFIX DEV_HMAGANTI_6</description>
+<defaultValue/>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>sb_name</name>
+<description>CIOC01</description>
+<defaultValue>MODEL</defaultValue>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>tests</name>
+<description/>
+<defaultValue/>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+</parameterDefinitions>
+</hudson.model.ParametersDefinitionProperty>
+</properties>
+<scm class="hudson.scm.NullSCM"/>
+<canRoam>true</canRoam>
+<disabled>false</disabled>
+<blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+<blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+<jdk>JDK18</jdk>
+<triggers/>
+<concurrentBuild>false</concurrentBuild>
+<customWorkspace>/opt/apps/jenkins2/sources/Institutional_Life/IL_MODEL_Validate_Specified_Tests_DX</customWorkspace>
+<builders>
+<hudson.tasks.Shell>
+<command> echo 'Sandbox name is: ' $sb_name echo 'pwd' pwd echo 'workspace is: ' $WORKSPACE cd ../ rm -r $WORKSPACE mkdir $WORKSPACE cd $WORKSPACE git clone --reference $WORKSPACE/../mirror_repo git@git.nylcloud.com:CRM/ilife_salesforce.git $WORKSPACE --branch $BRANCH </command>
+</hudson.tasks.Shell>
+<org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder plugin="conditional-buildstep@1.3.6">
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+<runCondition class="org.jenkins_ci.plugins.run_condition.core.AlwaysRun" plugin="run-condition@1.2"/>
+<conditionalbuilders>
+<hudson.tasks.Shell>
+<command>java -Dhttp.proxyPort=80 -Dhttps.proxyHost=zproxy.newyorklife.com -Dworkspace=$WORKSPACE -jar /opt/apps/jenkins/crm_tools/Sandbox/CISandboxManager-2.0.jar SFDXCLIENTID $sb_name</command>
+</hudson.tasks.Shell>
+<EnvInjectBuilder plugin="envinject@2.1.6">
+<info>
+<propertiesFilePath>$WORKSPACE/sandbox_SFDXCLIENTID.txt</propertiesFilePath>
+</info>
+</EnvInjectBuilder>
+<hudson.tasks.Shell>
+<command>export ALL_PROXY=http://zproxy.newyorklife.com:80 export HTTP_PROXY=$ALL_PROXY export HTTPS_PROXY=$ALL_PROXY export http_proxy=$ALL_PROXY export https_proxy=$ALL_PROXY export NODE_EXTRA_CA_CERTS=/home/jenkins/ZscalerRootCertificate-2048-SHA256.crt export SANDBOX=$sb_name sfdx force:auth:jwt:grant --clientid $sfdxclientid --jwtkeyfile /home/jenkins/jwt/server.key --username jenkins@newyorklife.com.prod.$sb_name --instanceurl https://test.salesforce.com --setalias $sb_name --loglevel debug sfdx force:org:list #With Tests #RunSpecifiedTests #sfdx force:source:deploy -u $SANDBOX --sourcepath force-app --testlevel RunLocalTests #Without Tests #sfdx force:source:deploy -u $SANDBOX --sourcepath force-app -l RunLocalTests #Validate with Tests #sfdx force:apex:test:run -u $SANDBOX sfdx force:source:deploy -u $sb_name -l RunSpecifiedTests -r $tests --sourcepath force-app/main/default -c -w 180 </command>
+</hudson.tasks.Shell>
+</conditionalbuilders>
+</org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder>
+<org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder plugin="conditional-buildstep@1.3.6">
+<condition class="org.jenkins_ci.plugins.text_finder_run_condition.TextFinderCondition" plugin="text-finder-run-condition@0.1">
+<regexp>Status: Succeeded</regexp>
+<checkConsoleOutput>true</checkConsoleOutput>
+</condition>
+<buildStep class="org.jenkins_ci.plugins.fail_the_build.FixResultBuilder" plugin="fail-the-build-plugin@1.0">
+<defaultResultName>SUCCESS</defaultResultName>
+<success/>
+<unstable/>
+<failure/>
+<aborted/>
+</buildStep>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+</org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder>
+<org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder plugin="conditional-buildstep@1.3.6">
+<condition class="org.jenkins_ci.plugins.text_finder_run_condition.TextFinderCondition" plugin="text-finder-run-condition@0.1">
+<regexp>Status: Failed</regexp>
+<checkConsoleOutput>true</checkConsoleOutput>
+</condition>
+<buildStep class="org.jenkins_ci.plugins.fail_the_build.FixResultBuilder" plugin="fail-the-build-plugin@1.0">
+<defaultResultName>FAILURE</defaultResultName>
+<success/>
+<unstable/>
+<failure/>
+<aborted/>
+</buildStep>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$Fail" plugin="run-condition@1.2"/>
+</org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder>
+</builders>
+<publishers>
+<org.jenkins__ci.plugins.flexible__publish.FlexiblePublisher plugin="flexible-publish@0.15.2">
+<publishers>
+<org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+<condition class="org.jenkins_ci.plugins.run_condition.core.NeverRun" plugin="run-condition@1.2"/>
+<publisherList>
+<hudson.tasks.Shell>
+<command> echo 'workspace: '$WORKSPACE echo 'build number: '$BUILD_NUMBER echo 'branch name: ' $BRANCH java -Dhttp.proxyPort=80 -Dhttps.proxyHost=nyproxy -Dworkspace=$WORKSPACE -jar /opt/apps/jenkins/crm_tools/Sandbox/CISandboxManager-1.0-SNAPSHOT.jar SBBUILDSTATUS $sandbox_name BUILD_SUCCESS</command>
+</hudson.tasks.Shell>
+</publisherList>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+<executionStrategy class="org.jenkins_ci.plugins.flexible_publish.strategy.FailAtEndExecutionStrategy"/>
+</org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+<org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+<condition class="org.jenkins_ci.plugins.run_condition.core.NeverRun" plugin="run-condition@1.2"/>
+<publisherList>
+<hudson.tasks.Shell>
+<command> echo 'workspace: '$WORKSPACE echo 'build number: '$BUILD_NUMBER echo 'branch name: ' $BRANCH java -Dhttp.proxyPort=80 -Dhttps.proxyHost=nyproxy -Dworkspace=$WORKSPACE -jar /opt/apps/jenkins/crm_tools/Sandbox/CISandboxManager-1.0-SNAPSHOT.jar SBBUILDSTATUS $sandbox_name BUILD_FAILURE</command>
+</hudson.tasks.Shell>
+</publisherList>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+<executionStrategy class="org.jenkins_ci.plugins.flexible_publish.strategy.FailAtEndExecutionStrategy"/>
+</org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+</publishers>
+</org.jenkins__ci.plugins.flexible__publish.FlexiblePublisher>
+<hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@2.66">
+<recipientList>$DEFAULT_RECIPIENTS</recipientList>
+<configuredTriggers>
+<hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+<email>
+<recipientList>Erick_Lindeman@newyorklife.com,alexander_zimnitski@newyorklife.com,Venkata_S_Bandi@newyorklife.com,danny_wen@newyorklife.com,harsha_maganti@newyorklife.com,ashish_kaul@newyorklife.com</recipientList>
+<subject>QA Deployment has failed for branch: $branch. Please follow below link or see attached log for errors.</subject>
+<body>Hi All, <br> <br> QA Deployment has failed for branch: $branch. Please access log at: <br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://ap21t01vsx:8080/jenkins/job/Validate_Run_Specified_Tests_DX/$build_number/consoleFull <br> <br> Thanks <br> Erick</body>
+<recipientProviders>
+<hudson.plugins.emailext.plugins.recipients.DevelopersRecipientProvider/>
+</recipientProviders>
+<attachmentsPattern/>
+<attachBuildLog>true</attachBuildLog>
+<compressBuildLog>false</compressBuildLog>
+<replyTo>erick_lindeman@newyorklife.com</replyTo>
+<contentType>text/html</contentType>
+</email>
+</hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+<hudson.plugins.emailext.plugins.trigger.SuccessTrigger>
+<email>
+<recipientList>Erick_Lindeman@newyorklife.com,alexander_zimnitski@newyorklife.com,Venkata_S_Bandi@newyorklife.com,danny_wen@newyorklife.com,harsha_maganti@newyorklife.com,ashish_kaul@newyorklife.com</recipientList>
+<subject>QA Deployment was successful for branch: $branch. Please follow below link to view log.</subject>
+<body>Hi All, <br> <br> QA Deployment was successful for branch: $branch. Please access log at: <br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://ap21t01vsx:8080/jenkins/job/Validate_Run_Specified_Tests_DX/$build_number/consoleFull <br> <br> Thanks <br> Erick</body>
+<recipientProviders>
+<hudson.plugins.emailext.plugins.recipients.DevelopersRecipientProvider/>
+</recipientProviders>
+<attachmentsPattern/>
+<attachBuildLog>false</attachBuildLog>
+<compressBuildLog>false</compressBuildLog>
+<replyTo>erick_lindeman@newyorklife.com</replyTo>
+<contentType>text/html</contentType>
+</email>
+</hudson.plugins.emailext.plugins.trigger.SuccessTrigger>
+</configuredTriggers>
+<contentType>default</contentType>
+<defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
+<defaultContent>$DEFAULT_CONTENT</defaultContent>
+<attachmentsPattern/>
+<presendScript>$DEFAULT_PRESEND_SCRIPT</presendScript>
+<postsendScript>$DEFAULT_POSTSEND_SCRIPT</postsendScript>
+<attachBuildLog>false</attachBuildLog>
+<compressBuildLog>false</compressBuildLog>
+<replyTo>$DEFAULT_REPLYTO</replyTo>
+<from/>
+<saveOutput>false</saveOutput>
+<disabled>true</disabled>
+</hudson.plugins.emailext.ExtendedEmailPublisher>
+</publishers>
+<buildWrappers>
+<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper/>
+<hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.9"/>
+</buildWrappers>
+</project>

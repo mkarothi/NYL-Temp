@@ -1,0 +1,224 @@
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<project>
+<actions/>
+<description/>
+<displayName>IL_INCREMENTAL_DX</displayName>
+<keepDependencies>false</keepDependencies>
+<properties>
+<hudson.security.AuthorizationMatrixProperty>
+<inheritanceStrategy class="org.jenkinsci.plugins.matrixauth.inheritance.InheritParentStrategy"/>
+</hudson.security.AuthorizationMatrixProperty>
+<com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.12">
+<gitLabConnection/>
+</com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+<hudson.model.ParametersDefinitionProperty>
+<parameterDefinitions>
+<hudson.model.ChoiceParameterDefinition>
+<name>API_CALL</name>
+<description/>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>SBINCREMENTALBUILD</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>SANDBOX_NAME</name>
+<description/>
+<defaultValue>QARELEASE</defaultValue>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>MASTER_BRANCH</name>
+<description>Branch name for Master branch</description>
+<defaultValue/>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>RELEASE_BRANCH</name>
+<description>Branch name for Release branch</description>
+<defaultValue/>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>INCREMENTAL_BRANCH</name>
+<description>Branch name for Incremental branch</description>
+<defaultValue/>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>INCLUDE_PROFILES</name>
+<description/>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>T</string>
+<string>F</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>INCLUDE_FLOWS</name>
+<description>To include WorkflowAlert,WorkflowFieldUpdate & WorkflowRule elements in package.xml or not. </description>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>T</string>
+<string>F</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+</parameterDefinitions>
+</hudson.model.ParametersDefinitionProperty>
+</properties>
+<scm class="hudson.scm.NullSCM"/>
+<canRoam>true</canRoam>
+<disabled>false</disabled>
+<blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+<blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+<jdk>JDK18</jdk>
+<triggers/>
+<concurrentBuild>false</concurrentBuild>
+<customWorkspace>/opt/apps/jenkins2/sources/Institutional_Life/IL_INCREMENTAL_DX</customWorkspace>
+<builders>
+<hudson.tasks.Shell>
+<command>#!/bin/bash # Define a timestamp function timestamp() { date +"%T" } echo " " echo "$(timestamp): Remove and Create Workspace Started" rm -r $WORKSPACE mkdir $WORKSPACE echo " " echo "$(timestamp): Remove Workspace Completed" cd $WORKSPACE echo " " echo "Start Clone of and setting up of MASTER, RELEASE and INCREMENTAL" echo " " git clone --reference $WORKSPACE/../mirror_repo git@git.nylcloud.com:CRM/ilife_salesforce.git $WORKSPACE/$MASTER_DIRECTORY --branch $MASTER_BRANCH & git clone --reference $WORKSPACE/../mirror_repo git@git.nylcloud.com:CRM/ilife_salesforce.git $WORKSPACE/$RELEASE_DIRECTORY --branch $RELEASE_BRANCH & git clone --reference $WORKSPACE/../mirror_repo git@git.nylcloud.com:CRM/ilife_salesforce.git $WORKSPACE/$INCREMENTAL_DIRECTORY --branch $EMPTYBRANCH & wait wait wait wait if [ -d "$WORKSPACE/$MASTER_DIRECTORY" ]; then # $MASTER_DIRECTORY Exists! echo $WORKSPACE/$MASTER_DIRECTORY Exists! cd $WORKSPACE/$MASTER_DIRECTORY git fetch git checkout $RELEASE_BRANCH git checkout $MASTER_BRANCH git pull else # $MASTER_DIRECTORY Does NOT Exist! Cloning new. echo $WORKSPACE/$MASTER_DIRECTORY Does NOT Exist! Cloning new. cd $WORKSPACE #git clone git@git.nylcloud.com:CRM/salesforce.git $MASTER_DIRECTORY git clone --reference $WORKSPACE/../mirror_repo git@git.nylcloud.com:CRM/ilife_salesforce.git $MASTER_DIRECTORY --branch $MASTER_BRANCH cd $WORKSPACE/$MASTER_DIRECTORY git checkout $MASTER_BRANCH git pull fi if [ -d "$WORKSPACE/$RELEASE_DIRECTORY" ]; then # $RELEASE_DIRECTORY Exists! echo $WORKSPACE/$RELEASE_DIRECTORY Exists! cd $WORKSPACE/$RELEASE_DIRECTORY git fetch git checkout $RELEASE_BRANCH git pull else # $RELEASE_DIRECTORY Does NOT Exist! Cloning new. echo $WORKSPACE/$RELEASE_DIRECTORY Does NOT Exist! Cloning new. cd $WORKSPACE #git clone git@git.nylcloud.com:CRM/salesforce.git $RELEASE_DIRECTORY git clone --reference $WORKSPACE/../mirror_repo git@git.nylcloud.com:CRM/ilife_salesforce.git $RELEASE_DIRECTORY --branch $RELEASE_BRANCH cd $WORKSPACE/$RELEASE_DIRECTORY git checkout $RELEASE_BRANCH git pull fi if [ -d "$WORKSPACE/$INCREMENTAL_DIRECTORY" ]; then # $INCREMENTAL_DIRECTORY Exists! echo $WORKSPACE/$INCREMENTAL_DIRECTORY Exists! cd $WORKSPACE/$INCREMENTAL_DIRECTORY git fetch echo "control before checkpoint 0" git show-ref --verify --quiet refs/remotes/origin/$INCREMENTAL_BRANCH BRANCH_EXIST_REMOTE=$? echo "value of BRANCH_EXIST_REMOTE is:" $BRANCH_EXIST_REMOTE echo "control before checkpoint 2" git show-ref --verify --quiet refs/heads/$INCREMENTAL_BRANCH BRANCH_EXIST_LOCAL=$? echo "value of BRANCH_EXIST_LOCAL is:" $BRANCH_EXIST_LOCAL if (( BRANCH_EXIST_REMOTE == 1 && BRANCH_EXIST_LOCAL == 0 )); then git branch --delete $INCREMENTAL_BRANCH #Overriding the value so that new branch will be created BRANCH_EXIST_LOCAL=1 fi if (( BRANCH_EXIST_REMOTE == 0 || BRANCH_EXIST_LOCAL == 0 )) then #echo "Branch name $INCREMENTAL_BRANCH already exists 1." git checkout $INCREMENTAL_BRANCH git branch --set-upstream $INCREMENTAL_BRANCH origin/$INCREMENTAL_BRANCH git pull else echo "Branch name $INCREMENTAL_BRANCH did not exist 1. Creating now." git checkout EMPTY_DX git checkout -b $INCREMENTAL_BRANCH git push origin $INCREMENTAL_BRANCH git branch --set-upstream $INCREMENTAL_BRANCH origin/$INCREMENTAL_BRANCH git pull fi else # $INCREMENTAL_DIRECTORY Does NOT Exist! Cloning new. echo $WORKSPACE/$INCREMENTAL_DIRECTORY Does NOT Exist! Cloning new. cd $WORKSPACE #git clone git@git.nylcloud.com:CRM/salesforce.git $INCREMENTAL_DIRECTORY git clone --reference $WORKSPACE/../mirror_repo git@git.nylcloud.com:CRM/ilife_salesforce.git $INCREMENTAL_DIRECTORY --branch $INCREMENTAL_BRANCH cd $WORKSPACE/$INCREMENTAL_DIRECTORY git show-ref --verify --quiet refs/remotes/origin/$INCREMENTAL_BRANCH BRANCH_EXIST_REMOTE=$? git show-ref --verify --quiet refs/heads/$INCREMENTAL_BRANCH BRANCH_EXIST_LOCAL=$? if (( BRANCH_EXIST_REMOTE == 1 && BRANCH_EXIST_LOCAL == 0 )); then git branch --delete $INCREMENTAL_BRANCH #Overriding the value so that new branch will be created BRANCH_EXIST_LOCAL=1 fi if (( BRANCH_EXIST_REMOTE == 0 || BRANCH_EXIST_LOCAL == 0 )) then #echo "Branch name $INCREMENTAL_BRANCH already exists 1." git checkout $INCREMENTAL_BRANCH git branch --set-upstream $INCREMENTAL_BRANCH origin/$INCREMENTAL_BRANCH git pull else echo "Branch name $INCREMENTAL_BRANCH did not exist 1. Creating now." git checkout EMPTY_DX git checkout -b $INCREMENTAL_BRANCH git push origin $INCREMENTAL_BRANCH git branch --set-upstream $INCREMENTAL_BRANCH origin/$INCREMENTAL_BRANCH git pull fi fi pwd echo 'inc dir is: '$WORKSPACE/$INCREMENTAL_DIRECTORY/force-app/ rm -rf $WORKSPACE/$INCREMENTAL_DIRECTORY/force-app/* cp $WORKSPACE/$RELEASE_DIRECTORY/CI_Sandbox_Version.txt $WORKSPACE/$INCREMENTAL_DIRECTORY/CI_Sandbox_Version.txt echo "Cloning of MASTER, RELEASE and INCREMENTAL branches is complete" echo "$(timestamp): Cloning of and setting up of MASTER, RELEASE and INCREMENTAL branches is complete" echo " " echo "********************************************************************" echo " " </command>
+</hudson.tasks.Shell>
+<org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder plugin="conditional-buildstep@1.3.6">
+<condition class="org.jenkins_ci.plugins.run_condition.core.StringsMatchCondition" plugin="run-condition@1.2">
+<arg1>$API_CALL</arg1>
+<arg2>SBINCREMENTALBUILD</arg2>
+<ignoreCase>true</ignoreCase>
+</condition>
+<buildStep class="hudson.tasks.Shell">
+<command> echo 'API_CALL: ' $API_CALL echo 'SANDBOX_NAME: '$SANDBOX_NAME echo 'MASTER_DIRECTORY: '$MASTER_DIRECTORY echo 'MASTER_BRANCH: '$MASTER_BRANCH echo 'RELEASE_DIRECTORY: '$RELEASE_DIRECTORY echo 'RELEASE_BRANCH: '$RELEASE_BRANCH echo 'INCREMENTAL_DIRECTORY: '$INCREMENTAL_DIRECTORY ls -ltr $WORKSPACE java -Dhttp.proxyPort=80 -Dhttps.proxyHost=proxy -Dworkspace=$WORKSPACE -jar /opt/apps/jenkins/crm_tools/Sandbox/CISandboxManager-2.0.jar $API_CALL $WORKSPACE/$MASTER_DIRECTORY $MASTER_BRANCH $WORKSPACE/$RELEASE_DIRECTORY $RELEASE_BRANCH $WORKSPACE/$INCREMENTAL_DIRECTORY $INCLUDE_PROFILES $INCLUDE_FLOWS ls -ltr $WORKSPACE</command>
+</buildStep>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+</org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder>
+</builders>
+<publishers>
+<org.jenkins__ci.plugins.flexible__publish.FlexiblePublisher plugin="flexible-publish@0.15.2">
+<publishers>
+<org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+<condition class="org.jenkins_ci.plugins.run_condition.core.AlwaysRun" plugin="run-condition@1.2"/>
+<publisherList>
+<EnvInjectBuilder plugin="envinject@2.1.6">
+<info>
+<propertiesContent>filetocheck=sandbox_$API_CALL.txt</propertiesContent>
+</info>
+</EnvInjectBuilder>
+<hudson.tasks.Shell>
+<command>echo $filetocheck if grep -Fxq "SUCCESS" $filetocheck then echo 'cistatus=readytocommit' > checkstatus.txt #echo $filetocheck > .gitignore #echo 'checkstatus.txt' >> .gitignore else echo 'cistatus=NOTreadytocommit' > checkstatus.txt fi </command>
+</hudson.tasks.Shell>
+<EnvInjectBuilder plugin="envinject@2.1.6">
+<info>
+<propertiesFilePath>checkstatus.txt</propertiesFilePath>
+</info>
+</EnvInjectBuilder>
+</publisherList>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$Fail" plugin="run-condition@1.2"/>
+<executionStrategy class="org.jenkins_ci.plugins.flexible_publish.strategy.FailAtEndExecutionStrategy"/>
+</org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+<org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+<condition class="org.jenkins_ci.plugins.run_condition.logic.And" plugin="run-condition@1.2">
+<conditions>
+<org.jenkins__ci.plugins.run__condition.logic.ConditionContainer>
+<condition class="org.jenkins_ci.plugins.run_condition.core.StringsMatchCondition">
+<arg1>$PUSH_TO_GIT</arg1>
+<arg2>TRUE</arg2>
+<ignoreCase>true</ignoreCase>
+</condition>
+</org.jenkins__ci.plugins.run__condition.logic.ConditionContainer>
+<org.jenkins__ci.plugins.run__condition.logic.ConditionContainer>
+<condition class="org.jenkins_ci.plugins.run_condition.core.StatusCondition">
+<worstResult>
+<name>SUCCESS</name>
+<ordinal>0</ordinal>
+<color>BLUE</color>
+<completeBuild>true</completeBuild>
+</worstResult>
+<bestResult>
+<name>SUCCESS</name>
+<ordinal>0</ordinal>
+<color>BLUE</color>
+<completeBuild>true</completeBuild>
+</bestResult>
+</condition>
+</org.jenkins__ci.plugins.run__condition.logic.ConditionContainer>
+<org.jenkins__ci.plugins.run__condition.logic.ConditionContainer>
+<condition class="org.jenkins_ci.plugins.run_condition.core.StringsMatchCondition">
+<arg1>$cistatus</arg1>
+<arg2>readytocommit</arg2>
+<ignoreCase>true</ignoreCase>
+</condition>
+</org.jenkins__ci.plugins.run__condition.logic.ConditionContainer>
+</conditions>
+</condition>
+<publisherList>
+<hudson.tasks.Shell>
+<command>echo 'start git' echo 'cistatus is: '$cistatus cd $INCREMENTAL_DIRECTORY git status if [[ -n $(git status -s) ]]; then echo 'git status did not return empty' #sleep 15 git add --all git commit -am "Added new delta components for: $BUILD_NUMBER" git push origin $INCREMENTAL_BRANCH else echo 'git status ruturned empty' #sleep 15 fi</command>
+</hudson.tasks.Shell>
+<hudson.tasks.Shell>
+<command>echo 'end git'</command>
+</hudson.tasks.Shell>
+</publisherList>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+<executionStrategy class="org.jenkins_ci.plugins.flexible_publish.strategy.FailAtEndExecutionStrategy"/>
+</org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+<org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+<condition class="org.jenkins_ci.plugins.run_condition.core.StringsMatchCondition" plugin="run-condition@1.2">
+<arg1>$cistatus</arg1>
+<arg2>readytocommit</arg2>
+<ignoreCase>true</ignoreCase>
+</condition>
+<publisherList/>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$Fail" plugin="run-condition@1.2"/>
+<executionStrategy class="org.jenkins_ci.plugins.flexible_publish.strategy.FailAtEndExecutionStrategy"/>
+</org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+</publishers>
+</org.jenkins__ci.plugins.flexible__publish.FlexiblePublisher>
+<hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@2.66">
+<recipientList>$DEFAULT_RECIPIENTS</recipientList>
+<configuredTriggers>
+<hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+<email>
+<recipientList>Erick_Lindeman@newyorklife.com,RamaNaveen_Kommuri@newyorklife.com,ramana_madupuru@newyorklife.com</recipientList>
+<subject>Incremental Build job failed</subject>
+<body>Incremental Build job failed</body>
+<recipientProviders>
+<hudson.plugins.emailext.plugins.recipients.DevelopersRecipientProvider/>
+</recipientProviders>
+<attachmentsPattern/>
+<attachBuildLog>false</attachBuildLog>
+<compressBuildLog>false</compressBuildLog>
+<replyTo>$PROJECT_DEFAULT_REPLYTO</replyTo>
+<contentType>project</contentType>
+</email>
+</hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+</configuredTriggers>
+<contentType>default</contentType>
+<defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
+<defaultContent>$DEFAULT_CONTENT</defaultContent>
+<attachmentsPattern/>
+<presendScript>$DEFAULT_PRESEND_SCRIPT</presendScript>
+<postsendScript>$DEFAULT_POSTSEND_SCRIPT</postsendScript>
+<attachBuildLog>false</attachBuildLog>
+<compressBuildLog>false</compressBuildLog>
+<replyTo>$DEFAULT_REPLYTO</replyTo>
+<from/>
+<saveOutput>false</saveOutput>
+<disabled>false</disabled>
+</hudson.plugins.emailext.ExtendedEmailPublisher>
+</publishers>
+<buildWrappers>
+<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper/>
+<EnvInjectBuildWrapper plugin="envinject@2.1.6">
+<info>
+<propertiesContent>PUSH_TO_GIT=TRUE INCREMENTAL_DIRECTORY=INCREMENTAL_DIR RELEASE_DIRECTORY=RELEASE_DIR MASTER_DIRECTORY=MASTER_DIR EMPTYBRANCH=EMPTY_DX</propertiesContent>
+<secureGroovyScript plugin="script-security@1.62">
+<script/>
+<sandbox>false</sandbox>
+</secureGroovyScript>
+<loadFilesFromMaster>false</loadFilesFromMaster>
+</info>
+</EnvInjectBuildWrapper>
+</buildWrappers>
+</project>

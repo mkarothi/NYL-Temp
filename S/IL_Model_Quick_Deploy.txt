@@ -1,0 +1,284 @@
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<project>
+<actions/>
+<description/>
+<displayName>IL_Model_Quick_Deploy</displayName>
+<keepDependencies>false</keepDependencies>
+<properties>
+<com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.12">
+<gitLabConnection/>
+</com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+<hudson.model.ParametersDefinitionProperty>
+<parameterDefinitions>
+<hudson.model.StringParameterDefinition>
+<name>recent_validation_id</name>
+<description>ID from validation</description>
+<defaultValue/>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>Tag_Validated</name>
+<description/>
+<defaultValue/>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>sb_name</name>
+<description/>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>MODEL</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>JENKINS_VALIDATE_JOB_URL</name>
+<description/>
+<defaultValue/>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>RUN_QA_AUTOMATION</name>
+<description>True will run MODEL_QA_AUTOMATION job</description>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>True</string>
+<string>False</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>GENERATE_PROFILES</name>
+<description>Generages CRM_ASM (read/write), READONLY (read) and DataMigration (read/write) proifles for all components after deployment of latest metadata</description>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>False</string>
+<string>True</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>RELEASE_BRANCH</name>
+<description>R17_MASTER</description>
+<defaultValue/>
+<trim>true</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>INCREMENTAL_BRANCH</name>
+<description>R17_INCREMENTAL_MODEL_20200719</description>
+<defaultValue/>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>COMMIT_AUTO_PROFILES</name>
+<description>Whether sourced profiles should be committed to Release and Incremental branches</description>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>False</string>
+<string>True</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>DEPLOY_AUTO_PROFILES</name>
+<description/>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>False</string>
+<string>True</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+</parameterDefinitions>
+</hudson.model.ParametersDefinitionProperty>
+</properties>
+<scm class="hudson.scm.NullSCM"/>
+<canRoam>true</canRoam>
+<disabled>false</disabled>
+<blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+<blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+<jdk>JDK18</jdk>
+<triggers/>
+<concurrentBuild>false</concurrentBuild>
+<customWorkspace>/opt/apps/jenkins2/sources/Institutional_Life/IL_Model_Quick_Deploy</customWorkspace>
+<builders>
+<hudson.tasks.Shell>
+<command> echo 'Sandbox name is: '$sb_name echo 'pwd' pwd echo 'workspace is: ' $WORKSPACE</command>
+</hudson.tasks.Shell>
+<org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder plugin="conditional-buildstep@1.3.6">
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+<runCondition class="org.jenkins_ci.plugins.run_condition.core.AlwaysRun" plugin="run-condition@1.2"/>
+<conditionalbuilders>
+<hudson.tasks.Ant plugin="ant@1.9">
+<targets>quickDeploy -debug</targets>
+<antName>(Default)</antName>
+<buildFile>/opt/apps/jenkins/force_com_migration_tool/salesforce_ant_43.0/nyl/_generic/build.xml</buildFile>
+<properties>/opt/apps/jenkins/force_com_migration_tool/salesforce_ant_43.0/nyl/_generic/build.properties sb_name=$sb_name User_ID=jenkins@newyorklife.com.prod sandbox_pw=$MODEL_EL deploy_workspace=$WORKSPACE deploy_root=/src/ recent_validation_id=$recent_validation_id</properties>
+</hudson.tasks.Ant>
+</conditionalbuilders>
+</org.jenkinsci.plugins.conditionalbuildstep.ConditionalBuilder>
+<org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder plugin="conditional-buildstep@1.3.6">
+<condition class="org.jenkins_ci.plugins.text_finder_run_condition.TextFinderCondition" plugin="text-finder-run-condition@0.1">
+<regexp>DEPLOYMENT SUCCEEDED</regexp>
+<checkConsoleOutput>true</checkConsoleOutput>
+</condition>
+<buildStep class="org.jenkins_ci.plugins.fail_the_build.FixResultBuilder" plugin="fail-the-build-plugin@1.0">
+<defaultResultName>SUCCESS</defaultResultName>
+<success/>
+<unstable/>
+<failure/>
+<aborted/>
+</buildStep>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+</org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder>
+<org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder plugin="conditional-buildstep@1.3.6">
+<condition class="org.jenkins_ci.plugins.text_finder_run_condition.TextFinderCondition" plugin="text-finder-run-condition@0.1">
+<regexp>DEPLOYMENT FAILED</regexp>
+<checkConsoleOutput>true</checkConsoleOutput>
+</condition>
+<buildStep class="org.jenkins_ci.plugins.fail_the_build.FixResultBuilder" plugin="fail-the-build-plugin@1.0">
+<defaultResultName>FAILURE</defaultResultName>
+<success/>
+<unstable/>
+<failure/>
+<aborted/>
+</buildStep>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+</org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder>
+</builders>
+<publishers>
+<org.jenkins__ci.plugins.flexible__publish.FlexiblePublisher plugin="flexible-publish@0.15.2">
+<publishers>
+<org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+<condition class="org.jenkins_ci.plugins.run_condition.core.StringsMatchCondition" plugin="run-condition@1.2">
+<arg1>$GENERATE_PROFILES</arg1>
+<arg2>True</arg2>
+<ignoreCase>true</ignoreCase>
+</condition>
+<publisherList>
+<hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.36">
+<configs>
+<hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+<configs>
+<hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
+<properties>Tag_Validated=$Tag_Validated SANDBOX_NAME=$sb_name RELEASE_BRANCH=$RELEASE_BRANCH INCREMENTAL_BRANCH=$INCREMENTAL_BRANCH COMMIT_AUTO_PROFILES=$COMMIT_AUTO_PROFILES DEPLOY_AUTO_PROFILES=$DEPLOY_AUTO_PROFILES</properties>
+<textParamValueOnNewLine>false</textParamValueOnNewLine>
+</hudson.plugins.parameterizedtrigger.PredefinedBuildParameters>
+</configs>
+<projects>AUTO_PROFILE_GENERATION_MODEL</projects>
+<condition>SUCCESS</condition>
+<triggerWithNoParameters>false</triggerWithNoParameters>
+<triggerFromChildProjects>false</triggerFromChildProjects>
+</hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+</configs>
+</hudson.plugins.parameterizedtrigger.BuildTrigger>
+</publisherList>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+<executionStrategy class="org.jenkins_ci.plugins.flexible_publish.strategy.FailAtEndExecutionStrategy"/>
+</org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+<org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+<condition class="org.jenkins_ci.plugins.run_condition.logic.And" plugin="run-condition@1.2">
+<conditions>
+<org.jenkins__ci.plugins.run__condition.logic.ConditionContainer>
+<condition class="org.jenkins_ci.plugins.run_condition.core.StringsMatchCondition">
+<arg1>$sb_name</arg1>
+<arg2>MODEL</arg2>
+<ignoreCase>false</ignoreCase>
+</condition>
+</org.jenkins__ci.plugins.run__condition.logic.ConditionContainer>
+<org.jenkins__ci.plugins.run__condition.logic.ConditionContainer>
+<condition class="org.jenkins_ci.plugins.run_condition.core.StringsMatchCondition">
+<arg1>RUN_QA_AUTOMATION</arg1>
+<arg2>True</arg2>
+<ignoreCase>false</ignoreCase>
+</condition>
+</org.jenkins__ci.plugins.run__condition.logic.ConditionContainer>
+<org.jenkins__ci.plugins.run__condition.logic.ConditionContainer>
+<condition class="org.jenkins_ci.plugins.run_condition.core.StatusCondition">
+<worstResult>
+<name>SUCCESS</name>
+<ordinal>0</ordinal>
+<color>BLUE</color>
+<completeBuild>true</completeBuild>
+</worstResult>
+<bestResult>
+<name>SUCCESS</name>
+<ordinal>0</ordinal>
+<color>BLUE</color>
+<completeBuild>true</completeBuild>
+</bestResult>
+</condition>
+</org.jenkins__ci.plugins.run__condition.logic.ConditionContainer>
+</conditions>
+</condition>
+<publisherList>
+<hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.36">
+<configs>
+<hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+<configs class="empty-list"/>
+<projects>MODEL_QA_Automation</projects>
+<condition>SUCCESS</condition>
+<triggerWithNoParameters>true</triggerWithNoParameters>
+<triggerFromChildProjects>false</triggerFromChildProjects>
+</hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+</configs>
+</hudson.plugins.parameterizedtrigger.BuildTrigger>
+</publisherList>
+<runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$DontRun" plugin="run-condition@1.2"/>
+<executionStrategy class="org.jenkins_ci.plugins.flexible_publish.strategy.FailAtEndExecutionStrategy"/>
+</org.jenkins__ci.plugins.flexible__publish.ConditionalPublisher>
+</publishers>
+</org.jenkins__ci.plugins.flexible__publish.FlexiblePublisher>
+<hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@2.66">
+<recipientList>$DEFAULT_RECIPIENTS</recipientList>
+<configuredTriggers>
+<hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+<email>
+<recipientList>Erick_Lindeman@newyorklife.com,Alexander_Zimnitski@newyorklife.com,Ramana_Madupuru@newyorklife.com</recipientList>
+<subject>Quick Deployment to $sb_name has failed for tag: $Tag_Validated. Please follow below link or see attached log for errors.</subject>
+<body>Hi All, <br> <br> Quick Deployment to $sb_name has failed for tag: $Tag_Validated. Please access log at: <br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://ap21t01vsx:8080/jenkins/job/Model_Quick_Deploy/$build_number/consoleFull <br> <br> Thanks <br> Erick</body>
+<recipientProviders>
+<hudson.plugins.emailext.plugins.recipients.DevelopersRecipientProvider/>
+</recipientProviders>
+<attachmentsPattern/>
+<attachBuildLog>true</attachBuildLog>
+<compressBuildLog>true</compressBuildLog>
+<replyTo>erick_lindeman@newyorklife.com</replyTo>
+<contentType>text/html</contentType>
+</email>
+</hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+<hudson.plugins.emailext.plugins.trigger.SuccessTrigger>
+<email>
+<recipientList>Erick_Lindeman@newyorklife.com,Alexander_Zimnitski@newyorklife.com,Ramana_Madupuru@newyorklife.com</recipientList>
+<subject>Quick Deployment to $sb_name was successful for tag: $Tag_Validated. Please follow below link to view log.</subject>
+<body>Hi All, <br> <br> Quick Deployment to $sb_name was successful for tag: $Tag_Validated. Please access log at: <br> <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://ap21t01vsx:8080/jenkins/job/Model_Quick_Deploy/$build_number/consoleFull <br> <br> Thanks <br> Erick</body>
+<recipientProviders>
+<hudson.plugins.emailext.plugins.recipients.DevelopersRecipientProvider/>
+</recipientProviders>
+<attachmentsPattern/>
+<attachBuildLog>true</attachBuildLog>
+<compressBuildLog>true</compressBuildLog>
+<replyTo>erick_lindeman@newyorklife.com</replyTo>
+<contentType>text/html</contentType>
+</email>
+</hudson.plugins.emailext.plugins.trigger.SuccessTrigger>
+</configuredTriggers>
+<contentType>default</contentType>
+<defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
+<defaultContent>$DEFAULT_CONTENT</defaultContent>
+<attachmentsPattern/>
+<presendScript>$DEFAULT_PRESEND_SCRIPT</presendScript>
+<postsendScript>$DEFAULT_POSTSEND_SCRIPT</postsendScript>
+<attachBuildLog>false</attachBuildLog>
+<compressBuildLog>false</compressBuildLog>
+<replyTo>$DEFAULT_REPLYTO</replyTo>
+<from/>
+<saveOutput>false</saveOutput>
+<disabled>false</disabled>
+</hudson.plugins.emailext.ExtendedEmailPublisher>
+</publishers>
+<buildWrappers>
+<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper/>
+<hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.9"/>
+</buildWrappers>
+</project>

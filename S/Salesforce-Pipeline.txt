@@ -1,0 +1,160 @@
+pipeline {
+	agent any
+	environment{
+		GITHUB_URL="git@git.nylcloud.com:CRM/ilife_salesforce.git"
+		BRANCH_NAME="master"
+		SALEFORCE_TARGET="Target name"
+	}
+	parameters{
+		 string(name: 'SALEFORCE_TARGET', defaultValue: '', description: 'Enter the target name')
+	}
+	stages{
+		stage('Git SCM - Dev'){
+			steps{
+    			checkout([
+    			    $class: 'GitSCM', 
+    			    branches: [[name: 'dev']], 
+    			    doGenerateSubmoduleConfigurations: false, 
+    			    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'dev']], 
+    			    submoduleCfg: [], 
+    			    userRemoteConfigs: [[credentialsId: 'T65OKG8', url: 'git@git.nylcloud.com:CRM/ilife_salesforce.git']]])
+			}
+		}
+		stage('Git SCM - Current'){
+			steps{
+    			checkout([
+    			    $class: 'GitSCM', 
+    			    branches: [[name: 'release-INTQA-curr']], 
+    			    doGenerateSubmoduleConfigurations: false, 
+    			    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'curr']], 
+    			    submoduleCfg: [], 
+    			    userRemoteConfigs: [[credentialsId: 'T65OKG8', url: 'git@git.nylcloud.com:CRM/ilife_salesforce.git']]])
+			}
+		}
+		stage('Git SCM - Previous'){
+			steps{
+    			checkout([
+    			    $class: 'GitSCM', 
+    			    branches: [[name: 'release-INTQA-pre']], 
+    			    doGenerateSubmoduleConfigurations: false, 
+    			    extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'pre']], 
+    			    submoduleCfg: [], 
+    			    userRemoteConfigs: [[credentialsId: 'T65OKG8', url: 'git@git.nylcloud.com:CRM/ilife_salesforce.git']]])
+			}
+		}
+	
+		stage('List Files'){
+			steps{
+			    script {
+			        sh '''
+			            ls -lrt
+						pwd
+			        '''
+			    }
+			}
+		}
+	
+		stage('Validate QA Org'){
+			steps{
+			    script {
+			        sh '''
+						cd dev/config
+			            ant validateINTQA
+			        '''
+			    }
+			}
+		}
+		stage('Deploy to QA Org'){
+			steps{
+			    script {
+			        sh '''
+						cd dev/config
+			            ant deployNYINTQA
+			        '''
+			    }
+			}
+		}
+		stage('Zip artifacts'){
+		    steps{
+		        script {
+		            sh '''
+		                ls -l
+						zip project ./dev
+						ls -l						
+					//	rm -rf *	
+		            '''
+		        }
+		    }
+		}
+		stage('Update Current to Previous'){
+		    steps{
+		        script {
+		            sh '''
+		                cd pre
+		                rm -rf *
+		                cp -r ../curr/* .
+		                git status
+		                git add .
+		                git commit -m "Update current branch to previous branch"
+		                git push
+		            '''
+		        }
+		    }
+		}
+		stage('Update Dev to Current'){
+		    steps{
+		        script {
+		            sh '''
+		                cd curr
+		                rm -rf *
+		                cp -r ../dev/* .
+		                git status
+		                git add .
+		                git commit -m "Update dev branch to current branch"
+		                git push
+		            '''
+		        }
+		    }
+		}
+		stage('Zip artifacts'){
+		    steps{
+		        script {
+		            sh '''
+		                pwd
+		                ls -l
+						zip -r project ./dev/src/classes/ ./dev/config/
+						ls -l
+		            '''
+		        }
+		    }
+		}
+		stage ('Artifactory upload') {
+            steps {
+                script {
+					def server = Artifactory.server 'Artifactory-1'
+					def uploadSpec = """{
+					  "files": [
+						{
+						  "pattern": "project.zip",
+						  "target": "artifactory/libs-snapshot-local/test/"
+						}
+					  ]
+					}"""
+					server.upload(uploadSpec)
+				}
+			}
+		}
+	}
+	post{
+		success {
+			emailext body: '''${JELLY_SCRIPT,template="html"}''',
+			mimeType: 'text/html',
+			recipientProviders: [developers()], subject: 'Test', to: 'Murthy_Karothi@newyorklife.com'
+		}
+		failure{
+			emailext body: '''${JELLY_SCRIPT,template="html"}''',
+			mimeType: 'text/html',
+			recipientProviders: [developers()], subject: 'Test', to: 'Murthy_Karothi@newyorklife.com'
+		}
+	}
+}
