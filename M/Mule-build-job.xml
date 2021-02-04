@@ -1,0 +1,225 @@
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<maven2-moduleset plugin="maven-plugin@3.4">
+<actions/>
+<description/>
+<keepDependencies>false</keepDependencies>
+<properties>
+<jenkins.plugins.maveninfo.config.MavenInfoJobConfig plugin="maven-info@0.2.0">
+<mainModulePattern/>
+<dependenciesPattern/>
+<assignName>false</assignName>
+<nameTemplate/>
+<assignDescription>false</assignDescription>
+<descriptionTemplate/>
+</jenkins.plugins.maveninfo.config.MavenInfoJobConfig>
+<com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.2">
+<gitLabConnection>Gitlab</gitLabConnection>
+</com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+<org.jenkinsci.plugins.mavenrepocleaner.MavenRepoCleanerProperty plugin="maven-repo-cleaner@1.2">
+<notOnThisProject>false</notOnThisProject>
+</org.jenkinsci.plugins.mavenrepocleaner.MavenRepoCleanerProperty>
+<hudson.model.ParametersDefinitionProperty>
+<parameterDefinitions>
+<eu.markov.jenkins.plugin.mvnmeta.MavenMetadataParameterDefinition plugin="maven-metadata-plugin@1.5.0">
+<name>MuleValidationCore</name>
+<description>Mule validation tool is used to check the static analysis on mule xml files </description>
+<repoBaseUrl>http://artifactory.eis.nonprod.nylcloudlabs.com/artifactory/libs-release-local</repoBaseUrl>
+<groupId>14080f21-4ee9-4275-b337-3816482cf4da.enterprise</groupId>
+<artifactId>mule-validation-core</artifactId>
+<packaging>jar</packaging>
+<classifier/>
+<defaultValue/>
+<versionFilter/>
+<sortOrder>DESC</sortOrder>
+<maxVersions/>
+<currentArtifactInfoUrl/>
+<currentArtifactInfoLabel/>
+<currentArtifactInfoPattern/>
+<credentialsId/>
+</eu.markov.jenkins.plugin.mvnmeta.MavenMetadataParameterDefinition>
+</parameterDefinitions>
+</hudson.model.ParametersDefinitionProperty>
+</properties>
+<scm class="hudson.plugins.git.GitSCM" plugin="git@3.9.1">
+<configVersion>2</configVersion>
+<userRemoteConfigs>
+<hudson.plugins.git.UserRemoteConfig>
+<url>git@git.nylcloud.com:EIS/instlife-hello-world.git</url>
+<credentialsId>eis-nonprod-jenkins-github</credentialsId>
+</hudson.plugins.git.UserRemoteConfig>
+</userRemoteConfigs>
+<branches>
+<hudson.plugins.git.BranchSpec>
+<name>*/main</name>
+</hudson.plugins.git.BranchSpec>
+</branches>
+<doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+<submoduleCfg class="list"/>
+<extensions/>
+</scm>
+<canRoam>true</canRoam>
+<disabled>false</disabled>
+<blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+<blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+<jdk>(System)</jdk>
+<triggers/>
+<concurrentBuild>false</concurrentBuild>
+<rootModule>
+<groupId>781685be-96f7-424d-bb05-b2f0a40f3014.instlife</groupId>
+<artifactId>instlife-hello-world</artifactId>
+</rootModule>
+<goals>-Dproxyset=true -DproxyHost=proxy.nonprod.nylcloudlabs.com -DproxyPort=80 clean install -s /var/lib/jenkins/mule/settings.xml -U -Dsonar.sources=. -Dsonar.exclusions=**/target/** sonar:sonar</goals>
+<aggregatorStyleBuild>true</aggregatorStyleBuild>
+<incrementalBuild>false</incrementalBuild>
+<ignoreUpstremChanges>false</ignoreUpstremChanges>
+<ignoreUnsuccessfulUpstreams>false</ignoreUnsuccessfulUpstreams>
+<archivingDisabled>false</archivingDisabled>
+<siteArchivingDisabled>false</siteArchivingDisabled>
+<fingerprintingDisabled>false</fingerprintingDisabled>
+<resolveDependencies>false</resolveDependencies>
+<processPlugins>false</processPlugins>
+<mavenValidationLevel>-1</mavenValidationLevel>
+<runHeadless>false</runHeadless>
+<disableTriggerDownstreamProjects>false</disableTriggerDownstreamProjects>
+<blockTriggerWhenBuilding>true</blockTriggerWhenBuilding>
+<settings class="jenkins.mvn.DefaultSettingsProvider"/>
+<globalSettings class="jenkins.mvn.DefaultGlobalSettingsProvider"/>
+<reporters/>
+<publishers>
+<io.jenkins.plugins.analysis.core.steps.IssuesRecorder plugin="warnings-ng@3.0.4-SNAPSHOT">
+<analysisTools>
+<io.jenkins.plugins.analysis.warnings.CustomReportParserTool plugin="eis-jenkins-validator-plugin@1.0.0-RELEASE">
+<id/>
+<name/>
+<pattern>**/mule-validator-report.json</pattern>
+<reportEncoding/>
+</io.jenkins.plugins.analysis.warnings.CustomReportParserTool>
+</analysisTools>
+<sourceCodeEncoding/>
+<ignoreQualityGate>false</ignoreQualityGate>
+<ignoreFailedBuilds>true</ignoreFailedBuilds>
+<referenceJobName>-</referenceJobName>
+<healthy>0</healthy>
+<unhealthy>0</unhealthy>
+<minimumSeverity plugin="analysis-model-api@2.1.2">
+<name>LOW</name>
+</minimumSeverity>
+<filters/>
+<isEnabledForFailure>false</isEnabledForFailure>
+<isAggregatingResults>false</isAggregatingResults>
+<isBlameDisabled>false</isBlameDisabled>
+<qualityGates/>
+</io.jenkins.plugins.analysis.core.steps.IssuesRecorder>
+<org.jfrog.hudson.ArtifactoryRedeployPublisher plugin="artifactory@2.13.0">
+<evenIfUnstable>false</evenIfUnstable>
+<details>
+<artifactoryName>1</artifactoryName>
+<artifactoryUrl>http://artifactory.eis.nonprod.nylcloudlabs.com/artifactory</artifactoryUrl>
+<deployReleaseRepository>
+<keyFromText>libs-release-local</keyFromText>
+<keyFromSelect>libs-release-local</keyFromSelect>
+<dynamicMode>true</dynamicMode>
+</deployReleaseRepository>
+<deploySnapshotRepository>
+<keyFromText>libs-snapshot-local</keyFromText>
+<keyFromSelect>libs-snapshot-local</keyFromSelect>
+<dynamicMode>true</dynamicMode>
+</deploySnapshotRepository>
+<stagingPlugin>
+<pluginName/>
+</stagingPlugin>
+<userPluginKey/>
+</details>
+<deployArtifacts>true</deployArtifacts>
+<artifactDeploymentPatterns>
+<includePatterns/>
+<excludePatterns/>
+</artifactDeploymentPatterns>
+<deployerCredentialsConfig>
+<credentials>
+<username/>
+<password/>
+</credentials>
+<credentialsId/>
+<overridingCredentials>false</overridingCredentials>
+<ignoreCredentialPluginDisabled>false</ignoreCredentialPluginDisabled>
+</deployerCredentialsConfig>
+<includeEnvVars>false</includeEnvVars>
+<envVarsPatterns>
+<includePatterns/>
+<excludePatterns>*password*,*secret*,*key*</excludePatterns>
+</envVarsPatterns>
+<runChecks>false</runChecks>
+<violationRecipients/>
+<includePublishArtifacts>false</includePublishArtifacts>
+<passIdentifiedDownstream>false</passIdentifiedDownstream>
+<scopes/>
+<licenseAutoDiscovery>true</licenseAutoDiscovery>
+<disableLicenseAutoDiscovery>false</disableLicenseAutoDiscovery>
+<discardOldBuilds>false</discardOldBuilds>
+<discardBuildArtifacts>true</discardBuildArtifacts>
+<asyncBuildRetention>false</asyncBuildRetention>
+<matrixParams/>
+<enableIssueTrackerIntegration>false</enableIssueTrackerIntegration>
+<allowPromotionOfNonStagedBuilds>false</allowPromotionOfNonStagedBuilds>
+<allowBintrayPushOfNonStageBuilds>false</allowBintrayPushOfNonStageBuilds>
+<filterExcludedArtifactsFromBuild>true</filterExcludedArtifactsFromBuild>
+<recordAllDependencies>false</recordAllDependencies>
+<defaultPromotionTargetRepository/>
+<deployBuildInfo>true</deployBuildInfo>
+<aggregationBuildStatus>Released</aggregationBuildStatus>
+<aggregateBuildIssues>false</aggregateBuildIssues>
+<blackDuckRunChecks>false</blackDuckRunChecks>
+<blackDuckAppName/>
+<blackDuckAppVersion/>
+<blackDuckReportRecipients/>
+<blackDuckScopes/>
+<blackDuckIncludePublishedArtifacts>false</blackDuckIncludePublishedArtifacts>
+<autoCreateMissingComponentRequests>true</autoCreateMissingComponentRequests>
+<autoDiscardStaleComponentRequests>true</autoDiscardStaleComponentRequests>
+<customBuildName/>
+<overrideBuildName>false</overrideBuildName>
+</org.jfrog.hudson.ArtifactoryRedeployPublisher>
+<hudson.plugins.git.GitPublisher plugin="git@3.9.1">
+<configVersion>2</configVersion>
+<pushMerge>false</pushMerge>
+<pushOnlyIfSuccess>true</pushOnlyIfSuccess>
+<forcePush>false</forcePush>
+<tagsToPush>
+<hudson.plugins.git.GitPublisher_-TagToPush>
+<targetRepoName>origin</targetRepoName>
+<tagName>${POM_VERSION}_T_${BUILD_TIMESTAMP}</tagName>
+<tagMessage/>
+<createTag>true</createTag>
+<updateTag>false</updateTag>
+</hudson.plugins.git.GitPublisher_-TagToPush>
+</tagsToPush>
+<branchesToPush/>
+<notesToPush/>
+</hudson.plugins.git.GitPublisher>
+</publishers>
+<buildWrappers>
+<hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.34">
+<deleteDirs>false</deleteDirs>
+<cleanupParameter/>
+<externalDelete/>
+</hudson.plugins.ws__cleanup.PreBuildCleanup>
+<org.jenkinsci.plugins.buildnamesetter.BuildNameSetter plugin="build-name-setter@1.6.9">
+<template>Build version : ${POM_VERSION}</template>
+<runAtStart>true</runAtStart>
+<runAtEnd>true</runAtEnd>
+</org.jenkinsci.plugins.buildnamesetter.BuildNameSetter>
+</buildWrappers>
+<prebuilders>
+<hudson.tasks.Shell>
+<command>echo "downloading mule validation " wget $MuleValidationCore_ARTIFACT_URL -O mule-validation-core.jar echo "running rules" java -jar mule-validation-core.jar /var/lib/jenkins/validationrules/mule ${WORKSPACE} </command>
+</hudson.tasks.Shell>
+</prebuilders>
+<postbuilders/>
+<runPostStepsIfResult>
+<name>FAILURE</name>
+<ordinal>2</ordinal>
+<color>RED</color>
+<completeBuild>true</completeBuild>
+</runPostStepsIfResult>
+</maven2-moduleset>

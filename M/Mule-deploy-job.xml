@@ -1,0 +1,275 @@
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<project>
+<actions/>
+<description/>
+<keepDependencies>false</keepDependencies>
+<properties>
+<com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.2">
+<gitLabConnection>Gitlab</gitLabConnection>
+</com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+<org.jenkinsci.plugins.mavenrepocleaner.MavenRepoCleanerProperty plugin="maven-repo-cleaner@1.2">
+<notOnThisProject>false</notOnThisProject>
+</org.jenkinsci.plugins.mavenrepocleaner.MavenRepoCleanerProperty>
+<hudson.model.ParametersDefinitionProperty>
+<parameterDefinitions>
+<hudson.model.StringParameterDefinition>
+<name>ExchangeAssetName</name>
+<description/>
+<defaultValue>instlife-hello-world</defaultValue>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>ExchangeAssetVersion</name>
+<description/>
+<defaultValue>1.0.0</defaultValue>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>ApiManagerAssetName</name>
+<description>As a convention this should be the exchange assert name</description>
+<defaultValue>instlife-hello-world</defaultValue>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>ApiManagerAssetVersion</name>
+<description>This should match with the version group defined for this exchange asset version</description>
+<defaultValue>v1</defaultValue>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>ApiContext</name>
+<description>URL structure <protocol>://<environment-host>/<ApiContext>/<endpoint> Example eis-communication-2-0 This will be the runtime manager asset name with the environment specific suffix added automatically. Example eis-communication-2-0-dev2. ApiContext should not contain environment suffix.</description>
+<defaultValue>instlife-hello-world-1-0</defaultValue>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+<eu.markov.jenkins.plugin.mvnmeta.MavenMetadataParameterDefinition plugin="maven-metadata-plugin@1.5.0">
+<name>ApiArtifact</name>
+<description>The build output of the application</description>
+<repoBaseUrl>http://artifactory.eis.nonprod.nylcloudlabs.com/artifactory/libs-release-local</repoBaseUrl>
+<groupId>781685be-96f7-424d-bb05-b2f0a40f3014.instlife</groupId>
+<artifactId>instlife-hello-world</artifactId>
+<packaging>jar</packaging>
+<classifier>mule-application</classifier>
+<defaultValue/>
+<versionFilter/>
+<sortOrder>DESC</sortOrder>
+<maxVersions/>
+<currentArtifactInfoUrl/>
+<currentArtifactInfoLabel/>
+<currentArtifactInfoPattern/>
+<credentialsId/>
+</eu.markov.jenkins.plugin.mvnmeta.MavenMetadataParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>SumologicUrl</name>
+<description>if sumologic is configured, provide the unique URL</description>
+<defaultValue/>
+<trim>true</trim>
+</hudson.model.StringParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>MuleRuntimeVersion</name>
+<description/>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>4.3.0</string>
+<string>4.2.2</string>
+<string>4.2.1</string>
+<string>4.2.0</string>
+<string>4.1.5</string>
+<string>4.1.4</string>
+<string>3.9.2</string>
+<string>3.9.1</string>
+<string>3.9.0</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>WorkerSize</name>
+<description>Worker size is the sizeof the vCores and the associative RAM size. (vertical scaling) For more information http://eiswiki.eis.nylcloud.com/xwiki/bin/view/Microservice%20Platform/Mule%20Platform/Mulesoft%20Ops%20Playbook/#HVerticalscalability </description>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>Micro</string>
+<string>Small</string>
+<string>Medium</string>
+<string>Large</string>
+<string>xLarge</string>
+<string>xxLarge</string>
+<string>xxxLarge</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>Workers</name>
+<description>Number of workers for the application (horizontal scaling)</description>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>1</string>
+<string>2</string>
+<string>3</string>
+<string>4</string>
+<string>5</string>
+<string>6</string>
+<string>7</string>
+<string>8</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>ToEnvironment</name>
+<description>The environment application will be deployed to</description>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>dev</string>
+<string>devint</string>
+<string>qa</string>
+<string>qaint</string>
+<string>stg</string>
+<string>prod</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>FromEnvironment</name>
+<description>Pick from an environment to deploy. Default behavior is to migrate from environment to environment seamlessly (dev -> devint -> qa -> qaint -> stage -> prod)</description>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>AUTO-SELECT</string>
+<string>dev</string>
+<string>devint</string>
+<string>qa</string>
+<string>qaint</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>UpdateMode</name>
+<description>When updating the application either the cloubhub configurations or runtime application binary</description>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>Configurations</string>
+<string>Application</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+<hudson.model.BooleanParameterDefinition>
+<name>UsePersistentQueues</name>
+<description>Enabled/Disable able persistent queues in runtime manager</description>
+<defaultValue>false</defaultValue>
+</hudson.model.BooleanParameterDefinition>
+<hudson.model.BooleanParameterDefinition>
+<name>UseObjectStoreV2</name>
+<description>Enable object store V2 in runtime manager(Mule-deployer 1.1.0.RELEASE cannot disable objectstore v2 from jenkins)</description>
+<defaultValue>false</defaultValue>
+</hudson.model.BooleanParameterDefinition>
+<hudson.model.BooleanParameterDefinition>
+<name>EnableAnalyticsAgent</name>
+<description>Used to enable or disable runtime manager analytics</description>
+<defaultValue>false</defaultValue>
+</hudson.model.BooleanParameterDefinition>
+<hudson.model.BooleanParameterDefinition>
+<name>EnableAutoRestart</name>
+<description>Enabled/Disable AutoRestart in runtime manager</description>
+<defaultValue>true</defaultValue>
+</hudson.model.BooleanParameterDefinition>
+<eu.markov.jenkins.plugin.mvnmeta.MavenMetadataParameterDefinition plugin="maven-metadata-plugin@1.5.0">
+<name>JAR2CONSUL</name>
+<description>Used to generate application bootstrap properties</description>
+<repoBaseUrl>http://artifactory.eis.nonprod.nylcloudlabs.com/artifactory/libs-release-local</repoBaseUrl>
+<groupId>com.nyl.eis.cicd</groupId>
+<artifactId>jar2consul</artifactId>
+<packaging>jar</packaging>
+<classifier/>
+<defaultValue/>
+<versionFilter/>
+<sortOrder>DESC</sortOrder>
+<maxVersions/>
+<currentArtifactInfoUrl/>
+<currentArtifactInfoLabel/>
+<currentArtifactInfoPattern/>
+<credentialsId/>
+</eu.markov.jenkins.plugin.mvnmeta.MavenMetadataParameterDefinition>
+<eu.markov.jenkins.plugin.mvnmeta.MavenMetadataParameterDefinition plugin="maven-metadata-plugin@1.5.0">
+<name>JAR2VAULT</name>
+<description>Used to push secure properties to vault</description>
+<repoBaseUrl>http://artifactory.eis.nonprod.nylcloudlabs.com/artifactory/libs-release-local</repoBaseUrl>
+<groupId>com.nyl.eis.cicd</groupId>
+<artifactId>jar2vault</artifactId>
+<packaging>jar</packaging>
+<classifier/>
+<defaultValue/>
+<versionFilter/>
+<sortOrder>DESC</sortOrder>
+<maxVersions/>
+<currentArtifactInfoUrl/>
+<currentArtifactInfoLabel/>
+<currentArtifactInfoPattern/>
+<credentialsId/>
+</eu.markov.jenkins.plugin.mvnmeta.MavenMetadataParameterDefinition>
+<eu.markov.jenkins.plugin.mvnmeta.MavenMetadataParameterDefinition plugin="maven-metadata-plugin@1.5.0">
+<name>MULEDEPLOYER</name>
+<description>Used to create/migrate mule artifacts ( Api manager asset / Runtime manager asset )</description>
+<repoBaseUrl>http://artifactory.eis.nonprod.nylcloudlabs.com/artifactory/libs-release-local</repoBaseUrl>
+<groupId>com.nyl.eis.cicd</groupId>
+<artifactId>mule-deployer</artifactId>
+<packaging>jar</packaging>
+<classifier/>
+<defaultValue/>
+<versionFilter/>
+<sortOrder>DESC</sortOrder>
+<maxVersions/>
+<currentArtifactInfoUrl/>
+<currentArtifactInfoLabel/>
+<currentArtifactInfoPattern/>
+<credentialsId/>
+</eu.markov.jenkins.plugin.mvnmeta.MavenMetadataParameterDefinition>
+<hudson.model.ChoiceParameterDefinition>
+<name>Region</name>
+<description/>
+<choices class="java.util.Arrays$ArrayList">
+<a class="string-array">
+<string>us-east-1</string>
+</a>
+</choices>
+</hudson.model.ChoiceParameterDefinition>
+<hudson.model.StringParameterDefinition>
+<name>OrganizationName</name>
+<description/>
+<defaultValue>Institutional-Life</defaultValue>
+<trim>false</trim>
+</hudson.model.StringParameterDefinition>
+</parameterDefinitions>
+</hudson.model.ParametersDefinitionProperty>
+</properties>
+<scm class="hudson.scm.NullSCM"/>
+<canRoam>true</canRoam>
+<disabled>false</disabled>
+<blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+<blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+<jdk>(System)</jdk>
+<triggers/>
+<concurrentBuild>false</concurrentBuild>
+<builders>
+<hudson.tasks.Shell>
+<command>rm -fr jar2consul.jar jar2vault.jar deployer.jar JAR2CONSUL_MAJOR=`echo $JAR2CONSUL_VERSION | awk -F "." '{print $1}'` JAR2VAULT_MAJOR=`echo $JAR2VAULT_VERSION | awk -F "." '{print $1}'` if [ "${JAR2CONSUL_MAJOR}" -lt 3 ]; then echo "Jar2Consul version should be 3.0.0 or greater" exit -1 fi if [ "${JAR2VAULT_MAJOR}" -lt 3 ]; then echo "Jar2Vault version should be 3.0.0 or greater" exit -1 fi MULE_MAJOR_VERSION=`echo $MuleRuntimeVersion | awk -F "." '{print $1}'` echo "Mule version $MULE_MAJOR_VERSION detected" export EnvName=$ToEnvironment export EnvPrefix=$ToEnvironment if [ "${EnvPrefix}" = "prod" ];then EnvPrefix="www" fi MULE_MAJOR_VERSION=`echo $MuleRuntimeVersion | awk -F "." '{print $1}'` echo "Mule version $MULE_MAJOR_VERSION detected" organaizationNameLower=`echo $OrganizationName | awk '{print tolower($0)}'` ENV=`echo $ToEnvironment | awk '{print toupper($0)}'` VAULT_ROLE_SUFFIX='_VAULT_ROLE_ID' VAULT_SECRET_SUFFIX='_VAULT_SECRET_ID' if [ $ENV == 'DEVINT' ] || [ $ENV == 'QA' ];then VAULT_ROLE_SUFFIX="${VAULT_ROLE_SUFFIX}2" VAULT_SECRET_SUFFIX="${VAULT_SECRET_SUFFIX}2" fi ROLEID="${ENV}${VAULT_ROLE_SUFFIX}" SECRETID="${ENV}${VAULT_SECRET_SUFFIX}" CONSUL_ACL=${ENV}_CONSUL_ACL CONSUL_HOST=${ENV}_CONSUL_HOST VAULT_HOST=${ENV}_VAULT_HOST if [ $MULE_MAJOR_VERSION -eq 4 ];then ARTIFACT_EXTENSION=.jar else ARTIFACT_EXTENSION=.zip fi ARTIFACT=$ApiArtifact_ARTIFACT_ID-$ApiArtifact_VERSION$ARTIFACT_EXTENSION echo "Retrieving Mule-CD configurations" cat<<EOF >vault.cred.json { "role_id": "${!ROLEID}", "secret_id": "${!SECRETID}" } EOF TOKEN=`curl https://${EnvPrefix}.vault.eis.nylcloud.com/v1/auth/approle/login -X POST -d @vault.cred.json | jq .auth.client_token` rm -f vault.cred.json ##curl https://${EnvPrefix}.vault.eis.nylcloud.com/v1/secret/mule/$organaizationNameLower -H "X-Vault-Token:${TOKEN:1:-1}" | jq .data |jq -r 'to_entries[]|"\(.key)=\(.value)"' > mulecd.properties curl https://${EnvPrefix}.vault.eis.nylcloud.com/v1/secret/mule/instlife -H "X-Vault-Token:${TOKEN:1:-1}" | jq .data |jq -r 'to_entries[]|"\(.key)=\(.value)"' > mulecd.properties CONNECTED_APPS=`grep "anypoint.connected-app.enabled" mulecd.properties | cut -d'=' -f2` if [ -z $CONNECTED_APPS ]; then CONNECTED_APPS=false fi ##CONFIG_URL=http://artifactory.eis.nonprod.nylcloudlabs.com/artifactory/automation/devops/mule/continuos-deployment/organization-config/${organaizationNameLower}-organization-config.yml CONFIG_URL=http://artifactory.eis.nonprod.nylcloudlabs.com/artifactory/automation/devops/mule/continuos-deployment/organization-config/instlife-organization-config.yml CONFIG_STATE=`curl -s $CONFIG_URL -o organization-config.yml -w "%{http_code}"` if [ $CONFIG_STATE == 200 ]; then EXT_ORG_CONFIG=--external-config=organization-config.yml fi echo "Mule-CD configurations are set" echo "Downloading artifact" wget -nv $ApiArtifact_ARTIFACT_URL -O $ARTIFACT echo "Downloading jar2consul" wget -nv $JAR2CONSUL_ARTIFACT_URL -O jar2consul.jar echo "Downloading jar2vault" wget -nv $JAR2VAULT_ARTIFACT_URL -O jar2vault.jar echo "Downloading mule-deployer" wget -nv $MULEDEPLOYER_ARTIFACT_URL -O deployer.jar echo "Generating credentials and uploading properties to consul" java -jar jar2consul.jar -Djar=$ARTIFACT -DappName=$ExchangeAssetName -Denv=$ToEnvironment -Dvault.role-id=${!ROLEID} -Dvault.secret-id=${!SECRETID} -Dvault.host=${!VAULT_HOST} -Dconsul.url=${!CONSUL_HOST} -Dconsul.acl=${!CONSUL_ACL} --is-mule-app if [ $? -lt 0 ]; then echo "Jar2Consul failed to generate bootstrap properties" exit -1 fi echo "Uploading vault properties" java -jar jar2vault.jar --pushkv --jar=$ARTIFACT --env=$ToEnvironment --bootstrap-location=bootstrap-${ToEnvironment}.properties if [ $? -lt 0 ]; then echo "Jar2Vault failed to push secure properties" exit -1 fi FROM_ENV_ARG= if [ $FromEnvironment != "AUTO-SELECT" ]; then FROM_ENV_ARG=--env.from=$FromEnvironment fi echo "Creating/Migrating API Manager asset" java -jar deployer.jar --deploy-api --config-file=mulecd.properties --organization.name=$OrganizationName --env=$EnvName --api.asset.version=$ExchangeAssetVersion --api.asset.name=$ExchangeAssetName --api.name=$ApiManagerAssetName --api.version=$ApiManagerAssetVersion --api.context=$ApiContext --mule.version=$MuleRuntimeVersion --connected-app.enabled=$CONNECTED_APPS $FROM_ENV_ARG $EXT_ORG_CONFIG ##java -jar deployer.jar --deploy-api --config-file=mulecd.properties --organization.name="Institutional Life" --env=$EnvName --api.asset.version=$ExchangeAssetVersion --api.asset.name=$ExchangeAssetName --api.name=$ApiManagerAssetName --api.version=$ApiManagerAssetVersion --api.context=$ApiContext --mule.version=$MuleRuntimeVersion --connected-app.enabled=$CONNECTED_APPS $FROM_ENV_ARG $EXT_ORG_CONFIG if [ $? -lt 0 ]; then echo "MuleDeployer failed to configure API manager asset" exit -1 fi echo "Deploying Runtime application" java -jar deployer.jar --deploy-application --config-file=mulecd.properties --api.config-file=bootstrap-${ToEnvironment}.properties --api.discovery-file=auto-discovery.properties --organization.name=$OrganizationName --env=$EnvName --api.context=$ApiContext --api.version=$ApiManagerAssetVersion --api.file=$ARTIFACT --mule.version=$MuleRuntimeVersion --worker.type=$WorkerSize --worker.count=$Workers --sumologic.url=$SumologicUrl --update-mode=$UpdateMode --persistent-queues.enabled=$UsePersistentQueues --object-store-v2.enabled=$UseObjectStoreV2 --autorestart.enabled=$EnableAutoRestart --connected-app.enabled=$CONNECTED_APPS --enable-analytics-agent=$EnableAnalyticsAgent --cloudhub.region=$Region $FROM_ENV_ARG $EXT_ORG_CONFIG ##java -jar deployer.jar --deploy-application --config-file=mulecd.properties --api.config-file=bootstrap-${ToEnvironment}.properties --api.discovery-file=auto-discovery.properties --organization.name="Institutional Life" --env=$EnvName --api.context=$ApiContext --api.version=$ApiManagerAssetVersion --api.file=$ARTIFACT --mule.version=$MuleRuntimeVersion --worker.type=$WorkerSize --worker.count=$Workers --sumologic.url=$SumologicUrl --update-mode=$UpdateMode --persistent-queues.enabled=$UsePersistentQueues --object-store-v2.enabled=$UseObjectStoreV2 --autorestart.enabled=$EnableAutoRestart --connected-app.enabled=$CONNECTED_APPS --enable-analytics-agent=$EnableAnalyticsAgent --cloudhub.region=$Region $FROM_ENV_ARG $EXT_ORG_CONFIG if [ $? -lt 0 ]; then echo "MuleDeployer failed to deploy runtime manager asset" exit -1 fi </command>
+</hudson.tasks.Shell>
+</builders>
+<publishers/>
+<buildWrappers>
+<hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.34">
+<deleteDirs>false</deleteDirs>
+<cleanupParameter/>
+<externalDelete/>
+</hudson.plugins.ws__cleanup.PreBuildCleanup>
+<com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper>
+<varMaskRegexes>
+<varMaskRegex regex="SECRETID=(\S+)"/>
+<varMaskRegex regex="ROLEID=(\S+)"/>
+<varMaskRegex regex="CONSUL_ACL=(\S+)"/>
+</varMaskRegexes>
+</com.michelin.cio.hudson.plugins.maskpasswords.MaskPasswordsBuildWrapper>
+<org.jenkinsci.plugins.buildnamesetter.BuildNameSetter plugin="build-name-setter@1.6.9">
+<template>#${BUILD_NUMBER}-Deploy-${ApiArtifact_VERSION}-to-${ToEnvironment}</template>
+<runAtStart>true</runAtStart>
+<runAtEnd>true</runAtEnd>
+</org.jenkinsci.plugins.buildnamesetter.BuildNameSetter>
+</buildWrappers>
+</project>
